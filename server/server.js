@@ -5,6 +5,8 @@ var modules = {
     url  : require("url"),
     fs   : require("fs"),
     path : require("path"),
+    fallback: require("./js/fallback.js"),
+    handler: require("./js/handler.js")
 }
 
 
@@ -19,7 +21,7 @@ var Authentication = function(req){
     if(!hash || !xdate || !username)
         return;
 
-    this.isValid = function(callback){
+    self.isValid = function(callback){
 
     };
 };
@@ -28,143 +30,96 @@ var Routing = function(){
     var pathDefinitions = {
         "/ws":{
             before: [authentication],
-            get: createWebsocket
+            get: handler.createWebsocket
         },
         "/users/:username" : {
             before: [authentication],
-            get: getUser,
-            post: modifyUser,
+            get: handler.getUser,
+            post: handler.modifyUser,
             "/pm/[\*]":{
-                get: getConversationPartnerNames
+                get: handler.getConversationPartnerNames
             },
             "/pm/:otherUser":{
-                get: getPrivateMessages
+                get: handler.getPrivateMessages
             }
         },
         "/register/:username":{
-            put: createUser
+            put: handler.createUser
         },
         "/groups/:groupName": {
             before: [authentication],
-            put: createGroup,
+            put: handler.createGroup,
 
             "/join/:pass":{
-                before: [checkPass]
-                put: enlistIntoGroup
+                before: [handler.checkPass]
+                put: handler.enlistIntoGroup
             },
             "/manage":{
-                before: [checkRole],
-                post: modifyGroup,
+                before: [handler.checkRole],
+                post: handler.modifyGroup,
             },
             "/channels/video/:channel": {
-                get   : getVideoChannel,
-                post  : modifyVideoChannel,
-                put   : createVideoChannel,
-                delete: deleteVideoChannel
+                get   : handler.getVideoChannel,
+                post  : handler.modifyVideoChannel,
+                put   : handler.createVideoChannel,
+                delete: handler.deleteVideoChannel
             },
             "/channels/text/:channel": {
-                get   : getTextChannel,
-                post  : modifyTextChannel,
-                put   : createTextChannel,
-                delete: deleteTextChannel
+                get   : handler.getTextChannel,
+                post  : handler.modifyTextChannel,
+                put   : handler.createTextChannel,
+                delete: handler.deleteTextChannel
             },
             "/channels/[\*]":{
-                get: getAllChannel,
+                get: handler.getAllChannel,
             },
             "/users/([\*])" : {
-                get: getUsers,
+                get: handler.getUsers,
             },
         }
-
     };
     
     var router = new require("director").http.Router(pathDefinitions);
     router.configure({async:true, recurse: "forward", strict : false});
 };
 
-var stores = global.store;
-var pathHandler = new Routing(global.config);
-
-var httpsConnect = function(sslOptions, cfg){
-    modules.https.createServer(sslOptions, function (req, res) {
-        handleRequests(req, res);
-    }).listen(cfg.httpsPort, cfg.binding);
-    return true;
-}
-
-var httpConnect = function(cfg){
-    modules.http.createServer(function (req, res){
-        handleRequests(req, res);
-    }).listen(cfg.httpPort, cfg.binding); // Port 80 requires root permission 
-}
-
-var BufferedRequest = function(req){
-    var self = this;
-
-    var contentLength = req.headers["content-length"] || 0;
-    var buffer = new Buffer(contentLength);
-    var offset = 0;
-    var ended = false;
-
-    self.raw = req;
-
-    req.on("data", function(chunk) {
-        buffer.write(chunk, offset);
-        offset += chunk.length;
-    });
-
-    req.on("end", function() {
-        ended = true;
-        
-        if(onEndCallback)
-            onEndCallback();
-    }); 
-
-    var onEndCallback;
-    self.onend = function(callback) {
-        onEndCallback = callback;
-        
-        if(ended)
-            onEndCallback();
-    };
-};
-
-var Server = function(config){
+var Server = function(config, router){
     var self =  this;
+    var router = new Routing(global.config);
 
-    var handleRequest = function(){
+    var handleRequest = function(req, res){
         if (req.method == "OPTIONS") {
             res.writeHead(global.OK, global.header.options);
             res.end();
             return;
         }
 
-        new StreamBuffer(req);
-
-        req.streambuffer.onend(function() {
-            req.self.req.dReq = new modules.store.DRequest(userID, self.req, self.res);
-            pathHandler.router.dispatch(req, res, function (err) {
-                if (err) {
-                    res.writeHead(global.ERROR_CLIENT.code);
-                    res.end(global.ERROR_CLIENT.msg);
-                }
-            });
+        router.dispatch(req, res, function (err) {
+            if (err) {
+                res.writeHead(global.ERROR_CLIENT.code);
+                res.end(global.ERROR_CLIENT.msg);
+            }
         });
     };
 
     self.start = function(){
         try{
+            //Trying to start HTTPS-Server
             var sslOptions = {
-                key: modules.fs.readFileSync(global.config.ssl.key),
-                cert: modules.fs.readFileSync(global.config.ssl.cert)
+                key: modules.fs.readFileSync(config.ssl.key),
+                cert: modules.fs.readFileSync(config.ssl.cert)
             };
 
             modules.https.createServer(sslOptions, function (req, res) {
                 handleRequests(req, res);
-            }).listen(cfg.https, cfg.bind);
+            }).listen(config.https, config.bind);
+
             modules.log.store("HTTPS- and HTTP- server started");
         }catch(e){
-
+            //HTTP Fallback
+            modules.http.createServer(function (req, res) {
+                handleRequests(req, res);
+            }).listen(config.https, config.bind);
         }
     };
 }
