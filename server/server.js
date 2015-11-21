@@ -41,57 +41,53 @@ var Routing = function(handler){
     };
 
     var pathDefinitions = {
-        "/register/":{
-            "/:username":{
-                put: handler.createUser
+        "/ws":{
+            get: handler.createWebsocket
+        },
+        "/r/:username":{
+            put: handler.createUser
+        },
+        "/u/:userName":{
+            before: [checkAuth],
+            get: handler.getUser,
+            post: handler.modifyUser,
+            "/pm/[\*]":{
+                get: handler.getConversationPartnerNames
+            },
+            "/pm/:otherUser":{
+                get: handler.getPrivateMessages
             }
         },
-        "/f/":{
+        "/g/:groupName"{
             before: [checkAuth],
-            "/ws":{
-                get: handler.createWebsocket
+            put: handler.createGroup,
+            "/join/:pass":{
+                before: [handler.checkPass]
+                put: handler.enlistIntoGroup
             },
-            "/users/:username" : {
-                get: handler.getUser,
-                post: handler.modifyUser,
-                "/pm/[\*]":{
-                    get: handler.getConversationPartnerNames
-                },
-                "/pm/:otherUser":{
-                    get: handler.getPrivateMessages
-                }
+            "/manage":{
+                before: [handler.checkRole],
+                post: handler.modifyGroup,
             },
-            "/groups/:groupName": {
-                put: handler.createGroup,
-                "/join/:pass":{
-                    before: [handler.checkPass]
-                    put: handler.enlistIntoGroup
-                },
-                "/manage":{
-                    before: [handler.checkRole],
-                    post: handler.modifyGroup,
-                },
-                "/channels/video/:channel": {
-                    get   : handler.getVideoChannel,
-                    post  : handler.modifyVideoChannel,
-                    put   : handler.createVideoChannel,
-                    delete: handler.deleteVideoChannel
-                },
-                "/channels/text/:channel": {
-                    get   : handler.getTextChannel,
-                    post  : handler.modifyTextChannel,
-                    put   : handler.createTextChannel,
-                    delete: handler.deleteTextChannel
-                },
-                "/channels/[\*]":{
-                    get: handler.getAllChannel,
-                },
-                "/users/([\*])" : {
-                    get: handler.getUsers,
-                },
+            "/channels/video/:channel": {
+                get   : handler.getVideoChannel,
+                post  : handler.modifyVideoChannel,
+                put   : handler.createVideoChannel,
+                delete: handler.deleteVideoChannel
+            },
+            "/channels/text/:channel": {
+                get   : handler.getTextChannel,
+                post  : handler.modifyTextChannel,
+                put   : handler.createTextChannel,
+                delete: handler.deleteTextChannel
+            },
+            "/channels/[\*]":{
+                get: handler.getAllChannel,
+            },
+            "/users/([\*])" : {
+                get: handler.getAllGroupUsers,
             }
-        }
-        
+        }        
     };
     
     var router = new require("director").http.Router(pathDefinitions);

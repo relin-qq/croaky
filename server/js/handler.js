@@ -2,27 +2,27 @@ var createWebsocket = function(){
 
 };
 
-var getUser = function(){
+var getUser = function(userName){
 
 };
 
-var modifyUser = function(){
+var modifyUser = function(userName){
 
 };
 
-var getConversationPartnerNames = function(){
+var getConversationPartnerNames = function(userName){
 
 };
 
-var getPrivateMessages = function(){
+var getPrivateMessages = function(userName, targetUsername){
 
 };
 
-var createUser = function(){
+var createUser = function(userName){
 
 };
 
-var createGroup = function(){
+var createGroup = function(groupName){
 
 };
 
@@ -30,7 +30,7 @@ var checkPass = function(groupName, pass){
 
 };
 
-var enlistIntoGroup = function(){
+var enlistIntoGroup = function(groupName){
 
 };
 
