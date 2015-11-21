@@ -9,83 +9,106 @@ var modules = {
     handler: require("./js/handler.js")
 }
 
+var Routing = function(handler){
 
-var Authentication = function(req){
-    var self = this;
-    self.path = require("url").parse(req.url).pathname;
-    self.xdate = req.headers["x-date"];
-    self.hash = req.headers["authorization"];
-    self.username = req.headers["x-user"];
-    self.method = req.method;
+    //should be defined in the routing definition... because of reasons.
+    var authentication = function(req){
+        var path     = require("url").parse(this.req.url).pathname;
 
-    if(!hash || !xdate || !username)
-        return;
+        var hash     = req.headers["authorization"];
+        var xdate    = req.headers["x-date"];
+        var username = req.headers["x-user"];
+        var method   = req.method;
 
-    self.isValid = function(callback){
+        if(!hash || !xdate || !username)
+            return next(false);
 
+        //TODO: check auth here
+        if(!auth)
+            return next(false);
+ 
+        return {
+            user: username,
+            date: xdate,
+            method: method,
+            path: path,
+            hash: hash
+        };
     };
-};
 
-var Routing = function(){
+    var checkAuth = function(next){
+        next(!!this.auth); 
+    };
+
     var pathDefinitions = {
-        "/ws":{
-            before: [authentication],
-            get: handler.createWebsocket
-        },
-        "/users/:username" : {
-            before: [authentication],
-            get: handler.getUser,
-            post: handler.modifyUser,
-            "/pm/[\*]":{
-                get: handler.getConversationPartnerNames
-            },
-            "/pm/:otherUser":{
-                get: handler.getPrivateMessages
+        "/register/":{
+            "/:username":{
+                put: handler.createUser
             }
         },
-        "/register/:username":{
-            put: handler.createUser
-        },
-        "/groups/:groupName": {
-            before: [authentication],
-            put: handler.createGroup,
-
-            "/join/:pass":{
-                before: [handler.checkPass]
-                put: handler.enlistIntoGroup
+        "/f/":{
+            before: [checkAuth],
+            "/ws":{
+                get: handler.createWebsocket
             },
-            "/manage":{
-                before: [handler.checkRole],
-                post: handler.modifyGroup,
+            "/users/:username" : {
+                get: handler.getUser,
+                post: handler.modifyUser,
+                "/pm/[\*]":{
+                    get: handler.getConversationPartnerNames
+                },
+                "/pm/:otherUser":{
+                    get: handler.getPrivateMessages
+                }
             },
-            "/channels/video/:channel": {
-                get   : handler.getVideoChannel,
-                post  : handler.modifyVideoChannel,
-                put   : handler.createVideoChannel,
-                delete: handler.deleteVideoChannel
-            },
-            "/channels/text/:channel": {
-                get   : handler.getTextChannel,
-                post  : handler.modifyTextChannel,
-                put   : handler.createTextChannel,
-                delete: handler.deleteTextChannel
-            },
-            "/channels/[\*]":{
-                get: handler.getAllChannel,
-            },
-            "/users/([\*])" : {
-                get: handler.getUsers,
-            },
+            "/groups/:groupName": {
+                put: handler.createGroup,
+                "/join/:pass":{
+                    before: [handler.checkPass]
+                    put: handler.enlistIntoGroup
+                },
+                "/manage":{
+                    before: [handler.checkRole],
+                    post: handler.modifyGroup,
+                },
+                "/channels/video/:channel": {
+                    get   : handler.getVideoChannel,
+                    post  : handler.modifyVideoChannel,
+                    put   : handler.createVideoChannel,
+                    delete: handler.deleteVideoChannel
+                },
+                "/channels/text/:channel": {
+                    get   : handler.getTextChannel,
+                    post  : handler.modifyTextChannel,
+                    put   : handler.createTextChannel,
+                    delete: handler.deleteTextChannel
+                },
+                "/channels/[\*]":{
+                    get: handler.getAllChannel,
+                },
+                "/users/([\*])" : {
+                    get: handler.getUsers,
+                },
+            }
         }
+        
     };
     
     var router = new require("director").http.Router(pathDefinitions);
-    router.configure({async:true, recurse: "forward", strict : false});
+    router.configure({
+        async:true,
+        recurse: "forward",
+        strict : false
+    });
+
+    router.attach(function(){
+        this.auth = authentication(this.req);
+    });
 };
 
 var Server = function(config, router){
     var self =  this;
-    var router = new Routing(global.config);
+    var router = new Routing(modules.handler);
 
     var handleRequest = function(req, res){
         if (req.method == "OPTIONS") {

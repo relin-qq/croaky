@@ -1,86 +1,86 @@
 var createWebsocket = function(){
 
-}
+};
 
 var getUser = function(){
 
-}
+};
 
 var modifyUser = function(){
 
-}
+};
 
 var getConversationPartnerNames = function(){
 
-}
+};
 
 var getPrivateMessages = function(){
 
-}
+};
 
 var createUser = function(){
 
-}
+};
 
 var createGroup = function(){
 
-}
+};
 
-var checkPass = function(){
+var checkPass = function(groupName, pass){
 
-}
+};
 
 var enlistIntoGroup = function(){
 
-}
+};
 
-var checkRole = function(){
+var checkRole = function(groupName, role){
 
-}
+};
 
 var modifyGroup = function(){
 
-}
+};
 
 var getVideoChannel = function(){
 
-}
+};
 
 var modifyVideoChannel = function(){
 
-}
+};
 
 var createVideoChannel = function(){
 
-}
+};
 
 var deleteVideoChannel = function(){
 
-}
+};
 
 var getTextChannel = function(){
 
-}
+};
 
 var modifyTextChannel = function(){
 
-}
+};
 
 var createTextChannel = function(){
 
-}
+};
 
 var deleteTextChannel = function(){
 
-}
+};
 
 var getAllChannel = function(){
 
-}
+};
 
 var getUsers = function(){
 
-}
+};
 
 exports.createWebsocket = createWebsocket;
 exports.getUser = getUser;
@@ -103,3 +103,4 @@ exports.createTextChannel = createTextChannel;
 exports.deleteTextChannel = deleteTextChannel;
 exports.getAllChannel = getAllChannel;
 exports.getUsers = getUsers;
+exports.authentication = authentication;
