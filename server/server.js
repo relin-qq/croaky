@@ -61,16 +61,16 @@ var Routing = function(handler){
                 get: handler.getPrivateMessages
             }
         },
-        "/g/:groupName"{
+        "/g/:groupName":{
             before: [checkAuth],
             put: handler.createGroup,
             "/join/:pass":{
-                before: [handler.checkPass]
+                before: [handler.checkPass],
                 put: handler.enlistIntoGroup
             },
             "/manage":{
                 before: [handler.checkRole],
-                post: handler.modifyGroup,
+                post: handler.modifyGroup
             },
             "/channels/video/:channel": {
                 get   : handler.getVideoChannel,
@@ -85,10 +85,10 @@ var Routing = function(handler){
                 delete: handler.deleteTextChannel
             },
             "/channels/[\*]":{
-                get: handler.getAllChannel,
+                get: handler.getAllChannel
             },
             "/users/([\*])" : {
-                get: handler.getAllGroupUsers,
+                get: handler.getAllGroupUsers
             }
         }        
     };

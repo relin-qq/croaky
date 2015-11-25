@@ -1,0 +1,10 @@
+{
+    "name"        : "Croaky",
+    "description" : "Croaky - The P2P-Browser Chat",
+    "author"      : ["Viktor Matkovic <matkovic@vs.uni-due.de>"],
+    "version"     : "0.1.0",
+    "dependencies": {
+        "director"    : "*"
+    },
+    "engine"      : "node >= 0.4.1"
+}
