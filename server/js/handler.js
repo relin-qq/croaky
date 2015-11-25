@@ -104,4 +104,3 @@ exports.createTextChannel = createTextChannel;
 exports.deleteTextChannel = deleteTextChannel;
 exports.getAllChannel = getAllChannel;
 exports.getUsers = getUsers;
-exports.authentication = authentication;

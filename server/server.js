@@ -5,7 +5,7 @@ var Https   = require("https");
 var Url     = require("url");
 
 //External Modules
-var extend = require('node.extend');
+var extend = require("extend");
 
 //Local Modules
 var Handler = require("./js/handler.js");
@@ -93,6 +93,9 @@ var Routing = function(handler){
         }        
     };
     
+    console.log(require("director").http.Router)
+    console.log(pathDefinitions)
+
     var router = new require("director").http.Router(pathDefinitions);
     router.configure({
         async  : true,
@@ -111,14 +114,14 @@ var Server = function(config, router){
 
     var handleRequest = function(req, res){
         if (req.method == "OPTIONS") {
-            res.writeHead(Enum.OK, config.cors.allowed);
+            res.writeHead(Enum.OK.value, config.cors.allowed);
             res.end();
             return;
         }
 
         router.dispatch(req, res, function (error) {
             if (error) {
-                res.writeHead(Enum.CLIENT_PATH_NOT_FOUND);
+                res.writeHead(Enum.CLIENT_PATH_NOT_FOUND.value);
                 res.end(Enum.CLIENT_PATH_NOT_FOUND.message);
             }
         });
