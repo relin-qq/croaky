@@ -1,17 +1,18 @@
 "use strict";
 //Core-Nodejs Modules
-var Http    = require("http");
-var Https   = require("https");
-var Url     = require("url");
+var Http     = require("http");
+var Https    = require("https");
+var Url      = require("url");
+var Director = require("director");
 
 //External Modules
-var extend = require("extend");
+var extend   = require("extend");
 
 //Local Modules
-var Handler = require("./js/handler.js");
-var Enums   = require("./js/enum.js");
+var Handler  = require("./js/handler.js");
+var Enums    = require("./js/enum.js");
 
-var Config = require("./config.js");
+var Config   = require("./config.js");
 
 var Routing = function(handler){
     //should be defined in the routing definition... because of reasons.
@@ -93,10 +94,8 @@ var Routing = function(handler){
         }        
     };
     
-    console.log(require("director").http.Router)
-    console.log(pathDefinitions)
-
-    var router = new require("director").http.Router(pathDefinitions);
+    var router = new Director.http.Router(pathDefinitions);
+    
     router.configure({
         async  : true,
         strict : false,
@@ -110,7 +109,6 @@ var Routing = function(handler){
 
 var Server = function(config, router){
     var self =  this;
-    var router = new Routing(modules.Handler);
 
     var handleRequest = function(req, res){
         if (req.method == "OPTIONS") {
