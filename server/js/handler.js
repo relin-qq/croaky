@@ -1,6 +1,6 @@
 "use strict";
 var createWebsocket = function(){
-
+	console.log("ws")
 };
 
 var getUser = function(userName){

@@ -17,7 +17,7 @@ var Config   = require("./config.js");
 var Routing = function(handler){
     //should be defined in the routing definition... because of reasons.
     var authentication = function(req){
-        var path     = Url.parse(this.req.url).pathname;
+        var path     = Url.parse(req.url).pathname;
 
         var hash     = req.headers["authorization"];
         var xdate    = req.headers["x-date"];
@@ -25,11 +25,11 @@ var Routing = function(handler){
         var method   = req.method;
 
         if(!hash || !xdate || !username)
-            return next(false);
+            return false;
 
         //TODO: check auth here
         if(!auth)
-            return next(false);
+            return false;
  
         return {
             user  : username,
@@ -105,6 +105,8 @@ var Routing = function(handler){
     router.attach(function(){
         this.auth = authentication(this.req);
     });
+
+    return router;
 };
 
 var Server = function(config, router){
@@ -134,14 +136,14 @@ var Server = function(config, router){
             };
 
             Https.createServer(sslOptions, function (req, res) {
-                handleRequests(req, res);
-            }).listen(config.https, config.bind);
+                handleRequest(req, res);
+            }).listen(config.https, config.interface);
 
         }catch(e){
             //HTTP Fallback
             Http.createServer(function (req, res) {
-                handleRequests(req, res);
-            }).listen(config.https, config.bind);
+                handleRequest(req, res);
+            }).listen(config.http, config.interface);
         }
     };
 }
