@@ -6,39 +6,39 @@ var Url      = require("url");
 var Director = require("director");
 
 //External Modules
-var extend   = require("extend");
+var Extend   = require("extend");
+var Primus   = require("primus");
 
 //Local Modules
 var Handler  = require("./js/handler.js");
 var Enums    = require("./js/enum.js");
 
-var Config   = require("./config.js");
+var authentication = function(req){
+    var path     = Url.parse(req.url).pathname;
+
+    var hash     = req.headers["authorization"];
+    var xdate    = req.headers["x-date"];
+    var username = req.headers["x-user"];
+    var method   = req.method;
+
+    if(!hash || !xdate || !username)
+        return false;
+
+    //TODO: check auth here
+    if(!auth)
+        return false;
+
+    return {
+        user  : username,
+        date  : xdate,
+        method: method,
+        path  : path,
+        hash  : hash
+    };
+};
 
 var Routing = function(handler){
     //should be defined in the routing definition... because of reasons.
-    var authentication = function(req){
-        var path     = Url.parse(req.url).pathname;
-
-        var hash     = req.headers["authorization"];
-        var xdate    = req.headers["x-date"];
-        var username = req.headers["x-user"];
-        var method   = req.method;
-
-        if(!hash || !xdate || !username)
-            return false;
-
-        //TODO: check auth here
-        if(!auth)
-            return false;
- 
-        return {
-            user  : username,
-            date  : xdate,
-            method: method,
-            path  : path,
-            hash  : hash
-        };
-    };
 
     var checkAuth = function(next){
         next(!!this.auth); 
@@ -127,6 +127,7 @@ var Server = function(config, router){
         });
     };
 
+    var nativeServer = null;
     self.start = function(){
         try{
             //Trying to start HTTPS-Server
@@ -135,20 +136,53 @@ var Server = function(config, router){
                 cert: modules.fs.readFileSync(config.ssl.cert)
             };
 
-            Https.createServer(sslOptions, function (req, res) {
+            nativeServer = Https.createServer(sslOptions, function (req, res) {
                 handleRequest(req, res);
             }).listen(config.https, config.interface);
 
         }catch(e){
             //HTTP Fallback
-            Http.createServer(function (req, res) {
+            nativeServer = Http.createServer(function (req, res) {
                 handleRequest(req, res);
             }).listen(config.http, config.interface);
         }
     };
+
+    self.getNativeServer = function(){
+        return nativeServer;
+    };
 }
+
+var parseConfig = function(path){
+    try {
+        var buffer = require("fs").readFileSync(path);
+        return JSON.parse(buffer.toString("utf8"));
+    }
+    catch (e) {
+        throw "Couldn't parse the config file.";
+    }
+};
+
+var Config = parseConfig("config.json");
 
 //TODO: use "extend" and check with template
 
 var server = new Server(Config, new Routing(Handler));
 server.start();
+
+var ws = new Primus(server.getNativeServer(), {
+    pathname: "/ws"
+});
+
+ws.on('connection', function (spark) {
+    console.log("lol")
+    spark.write('hello connnection')
+});
+
+ws.authorize(function (req, done) {
+    var auth = authentication(req);
+    if(auth)
+        return done(false);
+
+    done(true);
+});

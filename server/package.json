@@ -4,8 +4,10 @@
     "author"      : ["Viktor Matkovic <matkovic@vs.uni-due.de>"],
     "version"     : "0.1.0",
     "dependencies": {
-        "director"    : "*",
-        "extend"      : "*"
+        "director": "*",
+        "extend"  : "*",
+        "ws"      : "*",
+        "primus"  : "*"
     },
     "engine"      : "node >= 0.4.1"
 }
