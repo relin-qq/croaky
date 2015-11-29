@@ -3,83 +3,88 @@ var createWebsocket = function(){
 	console.log("ws")
 };
 
-var getUser = function(userName){
+var getUser = function(userName, callback){
+	callback({
+		code: 200,
+		msg:{
+			username: userName
+		}
+	})
+};
+
+var modifyUser = function(userName, callback){
 
 };
 
-var modifyUser = function(userName){
+var getConversationPartnerNames = function(userName, callback){
 
 };
 
-var getConversationPartnerNames = function(userName){
+var getPrivateMessages = function(userName, targetUsername, callback){
 
 };
 
-var getPrivateMessages = function(userName, targetUsername){
+var createUser = function(userName, callback){
 
 };
 
-var createUser = function(userName){
+var createGroup = function(groupName, callback){
 
 };
 
-var createGroup = function(groupName){
+var checkPass = function(groupName, pass, callback){
 
 };
 
-var checkPass = function(groupName, pass){
+var enlistIntoGroup = function(groupName, callback){
 
 };
 
-var enlistIntoGroup = function(groupName){
+var checkRole = function(groupName, role, callback){
 
 };
 
-var checkRole = function(groupName, role){
+var modifyGroup = function(callback){
 
 };
 
-var modifyGroup = function(){
+var getVideoChannel = function(callback){
 
 };
 
-var getVideoChannel = function(){
+var modifyVideoChannel = function(callback){
 
 };
 
-var modifyVideoChannel = function(){
+var createVideoChannel = function(callback){
 
 };
 
-var createVideoChannel = function(){
+var deleteVideoChannel = function(callback){
 
 };
 
-var deleteVideoChannel = function(){
+var getTextChannel = function(callback){
 
 };
 
-var getTextChannel = function(){
+var modifyTextChannel = function(callback){
 
 };
 
-var modifyTextChannel = function(){
+var createTextChannel = function(callback){
 
 };
 
-var createTextChannel = function(){
+var deleteTextChannel = function(callback){
 
 };
 
-var deleteTextChannel = function(){
+var getAllChannel = function(callback){
 
 };
 
-var getAllChannel = function(){
-
-};
-
-var getUsers = function(){
+var getUsers = function(callback){
 
 };
 
