@@ -13,6 +13,7 @@ var Primus    = require("primus");
 //Local Modules
 var Handler   = require("./js/handler.js");
 var ErrorType = require("./js/errortype.js");
+var Templates = require("./js/templates.js");
 
 var authentication = function(req){
     var path     = Url.parse(req.url).pathname;
@@ -75,6 +76,23 @@ var Routing = function(handler){
         return wrapped;
     };
 
+    var check = function(key){
+        var wrapped = function(){
+            var args = Array.prototype.slice.call(arguments);
+            var next = args.pop();
+
+            Templates.check.call(this, key, function(){
+                if(template)
+                    return next();
+
+                if(error)
+                    return next(error);
+            }); 
+        };
+
+        return wrapped;
+    };
+
     //Non websocket definitions
     var pathDefinitions = {
         "/r/:username":{
@@ -93,7 +111,7 @@ var Routing = function(handler){
         },
         "/g/:groupName":{
             before: [bind(checkAuth)],
-            put   : bind(handler.createGroup),
+            put   : [check("group"), bind(handler.createGroup)],
             "/join/:pass":{
                 before: [bind(handler.checkPass)],
                 put   : bind(handler.enlistIntoGroup)
@@ -131,6 +149,7 @@ var Routing = function(handler){
         recurse: "forward"
     });
 
+    //Will fire if all the data has been captured, meaning you do not have to concat the json chunks (director feature)
     router.attach(function(){
         this.auth = authentication(this.req);
     });
@@ -139,7 +158,7 @@ var Routing = function(handler){
 };
 
 var Server = function(config, router){
-    var self =  this;
+    var self = this;
 
     var handleRequest = function(req, res){
         if (req.method == "OPTIONS") {
@@ -147,6 +166,11 @@ var Server = function(config, router){
             res.end();
             return;
         }
+
+        req.chunks = [];
+        req.on("data", function (chunk) {
+            req.chunks.push(chunk.toString());
+        });
 
         router.dispatch(req, res, function (error) {
             res.writeHead(ErrorType.CLIENT_PATH_NOT_FOUND.code);
@@ -197,6 +221,7 @@ var Config = parseConfig("config.json");
 var server = new Server(Config, new Routing(Handler));
 server.start();
 
+//Websocket server on listening on the /ws path
 var ws = new Primus(server.getNativeServer(), {
     pathname: "/ws"
 });

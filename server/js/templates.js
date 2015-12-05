@@ -1,5 +1,6 @@
-"use strict"
-exports.templates = {
+
+
+var templates = {
     config: {
         host     : "localhost",
         interface: "0.0.0.0",
@@ -10,6 +11,27 @@ exports.templates = {
             cert: ""
         },
         cors : { },
+    },
+    register:{
+        name: "/(\w+)/",
+        email: "/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i",
+        password: "/(\w+)/"
+    },
+    register:{
+        name: "/(\w+)/",
+        email: "/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i",
+        password: "/(\w+)/"
+    },
+    channel: {
+        name: "/(\w+)/"
+    },
+    group: {
+        name: "/(\w+)/"
     }
-    //TODO: define the rest of the objects
+};
+
+exports.check = function(templateKey, callback){
+    var tempalte = templates[templateKey];
+    console.log(this.req.body)
+    return;
 };

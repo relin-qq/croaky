@@ -29,7 +29,6 @@ var createUser = function(userName, callback){
 };
 
 var createGroup = function(groupName, callback){
-
 };
 
 var checkPass = function(groupName, pass, callback){
