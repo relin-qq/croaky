@@ -27,6 +27,28 @@ var templates = {
     },
     group: {
         name: "/(\w+)/"
+    },
+    database: {
+        getUser                    : function(){},
+        modifyUser                 : function(){},
+        getConversationPartnerNames: function(){},
+        getPrivateMessages         : function(){},
+        createUser                 : function(){},
+        createGroup                : function(){},
+        checkPass                  : function(){},
+        enlistIntoGroup            : function(){},
+        checkRole                  : function(){},
+        modifyGroup                : function(){},
+        getVideoChannel            : function(){},
+        modifyVideoChannel         : function(){},
+        createVideoChannel         : function(){},
+        deleteVideoChannel         : function(){},
+        getTextChannel             : function(){},
+        modifyTextChannel          : function(){},
+        createTextChannel          : function(){},
+        deleteTextChannel          : function(){},
+        getAllChannel              : function(){},
+        getUser                    : function(){}
     }
 };
 
