@@ -1,15 +1,22 @@
 "use strict";
+//Core-Nodejs Modules
+var Url       = require("url");
+var Fs        = require("fs");
+
+//Local Modules
+var ErrorType = require("./errortype.js");
+var Templates = require("./templates.js");
+var Database = require("./db.js").create("./db/db.sql");
+
+
 var createWebsocket = function(){
-	console.log("ws")
+    console.log("ws")
 };
 
 var getUser = function(userName, callback){
-	callback({
-		code: 200,
-		msg:{
-			username: userName
-		}
-	})
+    Database.getUser(userName,"bla", "bla", function(error, result){
+        console.log(error, result);
+    });
 };
 
 var modifyUser = function(userName, callback){
@@ -25,18 +32,25 @@ var getPrivateMessages = function(userName, targetUsername, callback){
 };
 
 var createUser = function(userName, callback){
-
+    Database.createUser(userName, "bla", "bla", function(error){
+        console.log(error);
+    });
 };
 
 var createGroup = function(groupName, callback){
+    Database.createGroup(this.auth.user, groupName, function(error){
+        console.log(error);
+    });
 };
 
 var checkPass = function(groupName, pass, callback){
-
+    callback();
 };
 
-var enlistIntoGroup = function(groupName, callback){
-
+var enlist = function(groupName, callback){
+    Database.enlist(this.auth.user, groupName, function(error, result){
+        console.log(result);
+    });
 };
 
 var checkRole = function(groupName, role, callback){
@@ -95,7 +109,7 @@ exports.getPrivateMessages = getPrivateMessages;
 exports.createUser = createUser;
 exports.createGroup = createGroup;
 exports.checkPass = checkPass;
-exports.enlistIntoGroup = enlistIntoGroup;
+exports.enlist = enlist;
 exports.checkRole = checkRole;
 exports.modifyGroup = modifyGroup;
 exports.getVideoChannel = getVideoChannel;

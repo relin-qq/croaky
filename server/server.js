@@ -114,11 +114,11 @@ var Routing = function(handler){
             put   : [check("group"), bind(handler.createGroup)],
             "/join/:pass":{
                 before: [bind(handler.checkPass)],
-                put   : bind(handler.enlistIntoGroup)
+                put   : bind(handler.enlist)
             },
             "/manage":{
                 before: [bind(handler.checkRole)],
-                post: bind(handler.modifyGroup)
+                post  : bind(handler.modifyGroup)
             },
             "/channels/video/:channel": {
                 get   : bind(handler.getVideoChannel),

@@ -1,63 +1,54 @@
-var path   = require("path");
+var Fs =  require("fs");
 //External Modules
 var Extend = require("extend");
-var Sql    = require("sqlite3").verbose();
+var SQL    = require("sqlite3").verbose();
 
 var STATEMENTS = {
-    "select" : {²
-        // activation : "SELECT activationID, isActive FROM datastores WHERE userID = ?",
-        // permission : "SELECT permissions.permission FROM permissions LEFT JOIN acl ON permissions.permID = acl.permID WHERE (permissions.isPublic = 1 AND permissions.dirID = ?) OR (acl.remoteRowID = (SELECT remoteRowID FROM remotes WHERE remotes.remoteID = ? AND remotes.userID = ? LIMIT 1) AND permissions.dirID = ?)",
-        // groups     : "SELECT * FROM groups WHERE userID = ?",
-        // group      : "SELECT * FROM groups WHERE groupName = ? AND userID = ?",
-        // groupUsers : "SELECT remotes.remoteID AS remoteID FROM remotes LEFT JOIN acl ON remotes.remoteRowID = acl.remoteRowID WHERE acl.groupID = ?",
-        // permissions: "SELECT * FROM permissions WHERE groupID = ?"
+    "select" : {
+        user     : "SELECT * FROM users WHERE username = ?",
+        enlistment: "SELECT groupname FROM groups WHERE username = ?",
+        groupUsers: "SELECT username FROM groups WHERE groupname = ?",
     },
     "update" : {
-        // file : "UPDATE OR FAIL files SET _lastedited = ? WHERE fileID = ?",
-        // datastores: "UPDATE OR FAIL datastores SET activationID = ? WHERE userID = ?",
-        // isactiveupdate: "UPDATE OR FAIL datastores SET isActive = ? WHERE userID = ?"
+
     },
     "insert" : {
-        // reg : "INSERT INTO datastores VALUES (?, ?, ?, ?, ?, ?)",
-        // remote: "INSERT INTO remotes(remoteID, certificate, userID, _timestamp) VALUES (?,?,?,?)",
-        // group : "INSERT INTO groups(groupName, userID) VALUES (?,?)",
-        // permission : "INSERT INTO permissions(groupID, permission, dirID, path, isPublic) VALUES (?,?,?,?,?)",
-        // acl : "INSERT INTO acl(remoteRowID, groupID, permID) VALUES (?,?,?)"
+        enlistment: "INSERT INTO enlistments(groupname, username) VALUES (?,?)",
+        user      : "INSERT INTO users(username, email, password) VALUES (?,?,?)",
+        groups    : "INSERT INTO groups(groupname) VALUES (?)"
     },
     "delete" : {
-        // group: "DELETE FROM groups WHERE groupName = ? AND userID = ?"
+        groupUser: "DELETE FROM enlistment WHERE groupname = ? AND username = ?"
     },
     "create" : {
-        // files      : "CREATE TABLE IF NOT EXISTS files (fileID INTEGER PRIMARY KEY ASC, filename TEXT, dirID INTEGER, userID TEXT NOT NULL, path Text, author TEXT, mimetype TEXT, _timestamp INTEGER, _lastedited INTEGER, _length INTEGER, FOREIGN KEY (userID) REFERENCES datastores(userID) ON DELETE CASCADE, FOREIGN KEY (dirID) REFERENCES dirs(dirID) ON DELETE CASCADE, UNIQUE (dirID, filename, userID, path))",
-        // dirs       : "CREATE TABLE IF NOT EXISTS dirs (dirID INTEGER PRIMARY KEY ASC AUTOINCREMENT, dirname TEXT, parentDirID INTEGER, FOREIGN KEY (parentDirID) REFERENCES dirs(dirID) ON DELETE CASCADE, UNIQUE (dirname, parentDirID))",
-        // datastores : "CREATE TABLE IF NOT EXISTS datastores (userID TEXT PRIMARY KEY ASC, email TEXT, password TEXT, _timestamp INTEGER, activationID TEXT, isActive INTEGER DEFAULT 0)",
-        // remotes    : "CREATE TABLE IF NOT EXISTS remotes (remoteRowID INTEGER PRIMARY KEY ASC AUTOINCREMENT,remoteID TEXT, certificate TEXT, userID TEXT, _timestamp INTEGER, FOREIGN KEY (userID) REFERENCES datastores(userID) ON DELETE CASCADE, UNIQUE (remoteID, userID))",
-        // acl        : "CREATE TABLE IF NOT EXISTS acl (aclID INTEGER PRIMARY KEY AUTOINCREMENT, remoteRowID INTEGER, groupID INTEGER, permID INTEGER, FOREIGN KEY (remoteRowID) REFERENCES remotes(remoteRowID) ON DELETE CASCADE, FOREIGN KEY (groupID) REFERENCES groups(groupID) ON DELETE CASCADE, FOREIGN KEY (permID) REFERENCES permissions(permID) ON DELETE CASCADE, UNIQUE (groupID, permID, remoteRowID))",
-        // permissions: "CREATE TABLE IF NOT EXISTS permissions (permID INTEGER PRIMARY KEY AUTOINCREMENT, groupID INTEGER, permission TEXT, dirID INTEGER, path TEXT, isPublic INTEGER, FOREIGN KEY (groupID) REFERENCES groups(groupID) ON DELETE CASCADE, FOREIGN KEY (dirID) REFERENCES dirs(dirID) ON DELETE CASCADE, UNIQUE (groupID, permission, dirID))",
-        // groups     : "CREATE TABLE IF NOT EXISTS groups (groupID INTEGER PRIMARY KEY AUTOINCREMENT, groupName TEXT, userID TEXT, FOREIGN KEY (userID) REFERENCES datastores(userID) ON DELETE CASCADE, UNIQUE (groupName, userID))"
-
-        users      : "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, email TEXT, password TEXT)",
-        groups     : "CREATE TABLE IF NOT EXISTS groups (groupname TEXT PRIMARY KEY ON DELETE CASCADE)",
-        enlistment : "CREATE TABLE IF NOT EXISTS enlistment (enlistID INTEGER PRIMARY KEY AUTOINCREMENT, groupname TEXT, username TEXT, FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, FOREIGN KEY (groupname) REFERENCES groups(groupname) ON DELETE CASCADE, UNIQUE (groupname, username))"
+        users       : "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, email TEXT, password TEXT)",
+        groups      : "CREATE TABLE IF NOT EXISTS groups (groupname TEXT PRIMARY KEY)",
+        enlistments : "CREATE TABLE IF NOT EXISTS enlistments (enlistID INTEGER PRIMARY KEY AUTOINCREMENT, groupname TEXT, username TEXT, FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, FOREIGN KEY (groupname) REFERENCES groups(groupname) ON DELETE CASCADE, UNIQUE (groupname, username))",
     }
 }
 
-
-exports.Database = function(path) {
+//I like this style of defining class methods
+//TODO: maybe performance drawbacks ? https://developers.google.com/speed/articles/optimizing-javascript?csw=1
+var Database = function(path) {
     var self = this;
-    var db = new sql.Database(path);
+    var db = new SQL.Database(path);
 
-    //Create tables if not db does not have them
+    //Create tables if db does not have them
     db.serialize(function() {
         //Foreign keys must be activated
         db.run("PRAGMA foreign_keys = on;");
         db.run(STATEMENTS.create.users);
         db.run(STATEMENTS.create.groups);
-        db.run(STATEMENTS.create.enlistment);
+        db.run(STATEMENTS.create.enlistments);
     });
 
-    self.getUser = function(){
+    self.getUser = function(userName, callback){
+        db.get(STATEMENTS.select.user, [userName], function(error, row){
+            if(error)
+                return callback(error);
 
+            callback(null, row);
+        });
     };
 
     self.modifyUser = function(){
@@ -72,20 +63,46 @@ exports.Database = function(path) {
 
     };
 
-    self.createUser = function(){
+    self.createUser = function(userName, email, password, callback){
+        console.log(arguments)
+        //TODO: Password Hashing
+        db.run(STATEMENTS.insert.user, [userName, email, password], function(error){
+            if(error)
+                return callback(error);
 
+            callback(null);
+        });
     };
 
-    self.createGroup = function(){
+    self.createGroup = function(groupName, callback){
+        db.run(STATEMENTS.insert.group, [groupName], function(error){
+            if(error)
+                return callback(error);
 
+            callback(null);
+        });
     };
 
     self.checkPass = function(){
 
     };
 
-    self.enlistIntoGroup = function(){
+    self.enlist = function(userName, groupName){
+        db.run(STATEMENTS.insert.enlistment, [groupName, userName], function(error){
+            if(error)
+                return callback(error);
 
+            callback(null);
+        });
+    };
+
+    self.cancelEnlistment = function(userName, groupName){
+        db.run(STATEMENTS.delete.enlistment, [groupName, userName], function(error){
+            if(error)
+                return callback(error);
+
+            callback(null);
+        });
     };
 
     self.checkRole = function(){
@@ -135,4 +152,9 @@ exports.Database = function(path) {
     self.getUser = function(){
 
     };
+};
+
+exports.create = function(path){
+    console.log(require("path").resolve(path));
+    return new Database(path);
 };

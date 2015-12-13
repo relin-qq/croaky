@@ -36,7 +36,7 @@ var templates = {
         createUser                 : function(){},
         createGroup                : function(){},
         checkPass                  : function(){},
-        enlistIntoGroup            : function(){},
+        enlist            : function(){},
         checkRole                  : function(){},
         modifyGroup                : function(){},
         getVideoChannel            : function(){},
