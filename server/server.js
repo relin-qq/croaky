@@ -62,6 +62,7 @@ var Routing = function(handler){
                 if(error)
                     return next(error);
 
+
                 self.res.writeHead(response.code);
                 self.res.end(JSON.stringify(response.msg));
             });
@@ -152,6 +153,7 @@ var Routing = function(handler){
     //Will fire if all the data has been captured, meaning you do not have to concat the json chunks (director feature)
     router.attach(function(){
         this.auth = authentication(this.req);
+        this.data = JSON.parse(this.req.chunks.join("")) || null;
     });
 
     return router;
@@ -172,9 +174,11 @@ var Server = function(config, router){
             req.chunks.push(chunk.toString());
         });
 
-        router.dispatch(req, res, function (error) {
-            res.writeHead(ErrorType.CLIENT_PATH_NOT_FOUND.code);
-            res.end(ErrorType.CLIENT_PATH_NOT_FOUND.message);
+        req.on("end", function(){
+            router.dispatch(req, res, function (error) {
+                res.writeHead(error.code);
+                res.end(error.msg);
+            });
         });
     };
 

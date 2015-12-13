@@ -3,6 +3,37 @@ var Fs =  require("fs");
 var Extend = require("extend");
 var SQL    = require("sqlite3").verbose();
 
+var SQLERROR = {
+    "SQLITE_ERROR"     : 500, /* SQL error or missing database */
+    "SQLITE_INTERNAL"  : 500, /* Internal logic error in SQLite */
+    "SQLITE_PERM"      : 403, /* Access permission denied */
+    "SQLITE_ABORT"     : 400, /* Callback routine requested an abort */
+    "SQLITE_BUSY"      : 500, /* The database file is locked */
+    "SQLITE_LOCKED"    : 500, /* A table in the database is locked */
+    "SQLITE_NOMEM"     : 500, /* A malloc() failed */
+    "SQLITE_READONLY"  : 500, /* Attempt to write a readonly database */
+    "SQLITE_INTERRUPT" : 500, /* Operation terminated by sqlite3_interrupt()*/
+    "SQLITE_IOERR"     : 500, /* Some kind of disk I/O error occurred */
+    "SQLITE_CORRUPT"   : 500, /* The database disk image is malformed */
+    "SQLITE_NOTFOUND"  : 500, /* Unknown opcode in sqlite3_file_control() */
+    "SQLITE_FULL"      : 500, /* Insertion failed because database is full */
+    "SQLITE_CANTOPEN"  : 500, /* Unable to open the database file */
+    "SQLITE_PROTOCOL"  : 500, /* Database lock protocol error */
+    "SQLITE_EMPTY"     : 500, /* Database is empty */
+    "SQLITE_SCHEMA"    : 500, /* The database schema changed */
+    "SQLITE_TOOBIG"    : 500, /* String or BLOB exceeds size limit */
+    "SQLITE_CONSTRAINT": 403, /* Abort due to constraint violation */
+    "SQLITE_MISMATCH"  : 400, /* Data type mismatch */
+    "SQLITE_MISUSE"    : 500, /* Library used incorrectly */
+    "SQLITE_NOLFS"     : 500, /* Uses OS features not supported on host */
+    "SQLITE_AUTH"      : 401, /* Authorization denied */
+    "SQLITE_FORMAT"    : 500, /* Auxiliary database format error */
+    "SQLITE_RANGE"     : 500, /* 2nd parameter to sqlite3_bind out of range */
+    "SQLITE_NOTADB"    : 200, /* File opened that is not a database file */
+    "SQLITE_ROW"       : 200, /* sqlite3_step() has another row ready */
+    "SQLITE_DONE"      : 200 /* sqlite3_step() has finished executing */
+};
+
 var STATEMENTS = {
     "select" : {
         user     : "SELECT * FROM users WHERE username = ?",
@@ -25,7 +56,14 @@ var STATEMENTS = {
         groups      : "CREATE TABLE IF NOT EXISTS groups (groupname TEXT PRIMARY KEY)",
         enlistments : "CREATE TABLE IF NOT EXISTS enlistments (enlistID INTEGER PRIMARY KEY AUTOINCREMENT, groupname TEXT, username TEXT, FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, FOREIGN KEY (groupname) REFERENCES groups(groupname) ON DELETE CASCADE, UNIQUE (groupname, username))",
     }
-}
+};
+
+var createError = function(error){
+    return {
+        code: SQLERROR[error.code],
+        msg: error.toString()
+    };
+};
 
 //I like this style of defining class methods
 //TODO: maybe performance drawbacks ? https://developers.google.com/speed/articles/optimizing-javascript?csw=1
@@ -45,7 +83,7 @@ var Database = function(path) {
     self.getUser = function(userName, callback){
         db.get(STATEMENTS.select.user, [userName], function(error, row){
             if(error)
-                return callback(error);
+                return callback(createError(error));
 
             callback(null, row);
         });
@@ -64,11 +102,10 @@ var Database = function(path) {
     };
 
     self.createUser = function(userName, email, password, callback){
-        console.log(arguments)
         //TODO: Password Hashing
         db.run(STATEMENTS.insert.user, [userName, email, password], function(error){
             if(error)
-                return callback(error);
+                return callback(createError(error));
 
             callback(null);
         });
@@ -77,7 +114,7 @@ var Database = function(path) {
     self.createGroup = function(groupName, callback){
         db.run(STATEMENTS.insert.group, [groupName], function(error){
             if(error)
-                return callback(error);
+                return callback(createError(error));
 
             callback(null);
         });
@@ -99,7 +136,7 @@ var Database = function(path) {
     self.cancelEnlistment = function(userName, groupName){
         db.run(STATEMENTS.delete.enlistment, [groupName, userName], function(error){
             if(error)
-                return callback(error);
+                return callback(createError(error));
 
             callback(null);
         });
