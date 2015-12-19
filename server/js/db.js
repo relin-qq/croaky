@@ -47,6 +47,7 @@ var STATEMENTS = {
         enlistment: "INSERT INTO enlistments(groupname, username) VALUES (?,?)",
         user      : "INSERT INTO users(username, email, password) VALUES (?,?,?)",
         groups    : "INSERT INTO groups(groupname) VALUES (?)"
+        channels  : "INSERT INTO channels(channelname, groupname) VALUES (?,?)"
     },
     "delete" : {
         groupUser: "DELETE FROM enlistment WHERE groupname = ? AND username = ?"
@@ -55,6 +56,7 @@ var STATEMENTS = {
         users       : "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, email TEXT, password TEXT)",
         groups      : "CREATE TABLE IF NOT EXISTS groups (groupname TEXT PRIMARY KEY)",
         enlistments : "CREATE TABLE IF NOT EXISTS enlistments (enlistID INTEGER PRIMARY KEY AUTOINCREMENT, groupname TEXT, username TEXT, FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, FOREIGN KEY (groupname) REFERENCES groups(groupname) ON DELETE CASCADE, UNIQUE (groupname, username))",
+        channel     : "CREATE TABLE IF NOT EXISTS channels (channelID INTEGER PRIMARY KEY AUTOINCREMENT, channelname TEXT, groupname TEXT, FOREIGN KEY (groupname) ON DELETE CASCADE, UNIQUE(channelname, groupname))"
     }
 };
 
@@ -150,19 +152,19 @@ var Database = function(path) {
 
     };
 
-    self.getVideoChannel = function(){
+    self.getChannel = function(){
 
     };
 
-    self.modifyVideoChannel = function(){
+    self.modifyChannel = function(){
 
     };
 
-    self.createVideoChannel = function(){
+    self.createChannel = function(){
 
     };
 
-    self.deleteVideoChannel = function(){
+    self.deleteChannel = function(){
 
     };
 

@@ -67,19 +67,19 @@ var modifyGroup = function(callback){
 
 };
 
-var getVideoChannel = function(callback){
+var getChannel = function(callback){
 
 };
 
-var modifyVideoChannel = function(callback){
+var modifyChannel = function(callback){
 
 };
 
-var createVideoChannel = function(callback){
+var createChannel = function(callback){
 
 };
 
-var deleteVideoChannel = function(callback){
+var deleteChannel = function(callback){
 
 };
 
@@ -118,10 +118,10 @@ exports.checkPass = checkPass;
 exports.enlist = enlist;
 exports.checkRole = checkRole;
 exports.modifyGroup = modifyGroup;
-exports.getVideoChannel = getVideoChannel;
-exports.modifyVideoChannel = modifyVideoChannel;
-exports.createVideoChannel = createVideoChannel;
-exports.deleteVideoChannel = deleteVideoChannel;
+exports.getChannel = getChannel;
+exports.modifyChannel = modifyChannel;
+exports.createChannel = createChannel;
+exports.deleteChannel = deleteChannel;
 exports.getTextChannel = getTextChannel;
 exports.modifyTextChannel = modifyTextChannel;
 exports.createTextChannel = createTextChannel;

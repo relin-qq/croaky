@@ -1,5 +1,3 @@
-
-
 var templates = {
     config: {
         host     : "localhost",
@@ -25,7 +23,7 @@ var templates = {
     channel: {
         name: "/(\w+)/"
     },
-    group: {
+    group: {^
         name: "/(\w+)/"
     },
     database: {
@@ -36,13 +34,13 @@ var templates = {
         createUser                 : function(){},
         createGroup                : function(){},
         checkPass                  : function(){},
-        enlist            : function(){},
+        enlist                     : function(){},
         checkRole                  : function(){},
         modifyGroup                : function(){},
-        getVideoChannel            : function(){},
-        modifyVideoChannel         : function(){},
-        createVideoChannel         : function(){},
-        deleteVideoChannel         : function(){},
+        getChannel                 : function(){},
+        modifyChannel              : function(){},
+        createChannel              : function(){},
+        deleteChannel              : function(){},
         getTextChannel             : function(){},
         modifyTextChannel          : function(){},
         createTextChannel          : function(){},
