@@ -41,10 +41,6 @@ var templates = {
         modifyChannel              : function(){},
         createChannel              : function(){},
         deleteChannel              : function(){},
-        getTextChannel             : function(){},
-        modifyTextChannel          : function(){},
-        createTextChannel          : function(){},
-        deleteTextChannel          : function(){},
         getAllChannel              : function(){},
         getUser                    : function(){}
     }

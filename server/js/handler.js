@@ -83,22 +83,6 @@ var deleteChannel = function(callback){
 
 };
 
-var getTextChannel = function(callback){
-
-};
-
-var modifyTextChannel = function(callback){
-
-};
-
-var createTextChannel = function(callback){
-
-};
-
-var deleteTextChannel = function(callback){
-
-};
-
 var getAllChannel = function(callback){
 
 };
@@ -122,9 +106,5 @@ exports.getChannel = getChannel;
 exports.modifyChannel = modifyChannel;
 exports.createChannel = createChannel;
 exports.deleteChannel = deleteChannel;
-exports.getTextChannel = getTextChannel;
-exports.modifyTextChannel = modifyTextChannel;
-exports.createTextChannel = createTextChannel;
-exports.deleteTextChannel = deleteTextChannel;
 exports.getAllChannel = getAllChannel;
 exports.getUsers = getUsers;

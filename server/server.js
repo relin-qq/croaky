@@ -121,17 +121,11 @@ var Routing = function(handler){
                 before: [bind(handler.checkRole)],
                 post  : bind(handler.modifyGroup)
             },
-            "/channels/video/:channel": {
+            "/channels/:channel": {
                 get   : bind(handler.getChannel),
                 post  : bind(handler.modifyChannel),
                 put   : bind(handler.createChannel),
                 delete: bind(handler.deleteChannel)
-            },
-            "/channels/text/:channel": {
-                get   : bind(handler.getTextChannel),
-                post  : bind(handler.modifyTextChannel),
-                put   : bind(handler.createTextChannel),
-                delete: bind(handler.deleteTextChannel)
             },
             "/channels/[\*]":{
                 get: bind(handler.getAllChannel)

@@ -36,9 +36,11 @@ var SQLERROR = {
 
 var STATEMENTS = {
     "select" : {
-        user     : "SELECT * FROM users WHERE username = ?",
+        user      : "SELECT * FROM users WHERE username = ?",
         enlistment: "SELECT groupname FROM groups WHERE username = ?",
         groupUsers: "SELECT username FROM groups WHERE groupname = ?",
+        channel   : "SELECT info FROM channels WHERE channelname = ? AND groupname = ?",
+        channels  : "SELECT channelname AND groupname FROM channels WHERE groupname = ?"
     },
     "update" : {
 
@@ -56,7 +58,7 @@ var STATEMENTS = {
         users       : "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, email TEXT, password TEXT)",
         groups      : "CREATE TABLE IF NOT EXISTS groups (groupname TEXT PRIMARY KEY)",
         enlistments : "CREATE TABLE IF NOT EXISTS enlistments (enlistID INTEGER PRIMARY KEY AUTOINCREMENT, groupname TEXT, username TEXT, FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, FOREIGN KEY (groupname) REFERENCES groups(groupname) ON DELETE CASCADE, UNIQUE (groupname, username))",
-        channel     : "CREATE TABLE IF NOT EXISTS channels (channelID INTEGER PRIMARY KEY AUTOINCREMENT, channelname TEXT, groupname TEXT, FOREIGN KEY (groupname) ON DELETE CASCADE, UNIQUE(channelname, groupname))"
+        channels    : "CREATE TABLE IF NOT EXISTS channels (channelID INTEGER PRIMARY KEY AUTOINCREMENT, channelname TEXT, groupname TEXT, info TEXT, FOREIGN KEY (groupname) ON DELETE CASCADE, UNIQUE(channelname, groupname))"
     }
 };
 
@@ -153,7 +155,12 @@ var Database = function(path) {
     };
 
     self.getChannel = function(){
+        db.get(STATEMENTS.select.channel, [channel, group], function(error, row){
+            if(error)
+                return callback(createError(error));
 
+            callback(null, row);
+        });
     };
 
     self.modifyChannel = function(){
@@ -168,24 +175,14 @@ var Database = function(path) {
 
     };
 
-    self.getTextChannel = function(){
+    self.getAllChannel = function(groupName){
+        db.all(STATEMENTS.select.channels, [groupName], function(error, rows){
+            if(error)
+                return callback(createError(error));
 
-    };
-
-    self.modifyTextChannel = function(){
-
-    };
-
-    self.createTextChannel = function(){
-
-    };
-
-    self.deleteTextChannel = function(){
-
-    };
-
-    self.getAllChannel = function(){
-
+            
+            callback(null, rows);
+        });
     };
 
     self.getUser = function(){
