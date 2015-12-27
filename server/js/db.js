@@ -48,7 +48,7 @@ var STATEMENTS = {
     "insert" : {
         enlistment: "INSERT INTO enlistments(groupname, username) VALUES (?,?)",
         user      : "INSERT INTO users(username, email, password) VALUES (?,?,?)",
-        groups    : "INSERT INTO groups(groupname) VALUES (?)"
+        groups    : "INSERT INTO groups(groupname) VALUES (?)",
         channels  : "INSERT INTO channels(channelname, groupname) VALUES (?,?)"
     },
     "delete" : {

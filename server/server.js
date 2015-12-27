@@ -8,12 +8,12 @@ var Fs        = require("fs");
 //External Modules
 var Extend    = require("extend");
 var Director  = require("director");
-var Primus    = require("primus");
 
 //Local Modules
 var Handler   = require("./js/handler.js");
 var ErrorType = require("./js/errortype.js");
 var Templates = require("./js/templates.js");
+var WebsocketManager = require("./js/wsm.js").WebsocketManager;
 
 var authentication = function(req){
     var path     = Url.parse(req.url).pathname;
@@ -176,8 +176,10 @@ var Server = function(config, router){
         });
     };
 
+    self.authentication = authentication;
+
     var nativeServer = null;
-    self.start = function(){
+    var start = function(){
         try{
             //Trying to start HTTPS-Server
             var sslOptions = {
@@ -200,6 +202,8 @@ var Server = function(config, router){
     self.getNativeServer = function(){
         return nativeServer;
     };
+
+    start();
 }
 
 var parseConfig = function(path){
@@ -217,21 +221,4 @@ var Config = parseConfig("config.json");
 //TODO: use "extend" and check with template
 
 var server = new Server(Config, new Routing(Handler));
-server.start();
-
-//Websocket server on listening on the /ws path
-var ws = new Primus(server.getNativeServer(), {
-    pathname: "/ws"
-});
-
-ws.on("connection", function (spark) {
-    spark.write("hello connnection")
-});
-
-ws.authorize(function (req, done) {
-    var auth = authentication(req);
-    if(!auth)
-        return done({});
-
-    done();
-});
+var ws = new WebsocketManager(server);

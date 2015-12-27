@@ -23,7 +23,7 @@ var templates = {
     channel: {
         name: "/(\w+)/"
     },
-    group: {^
+    group: {
         name: "/(\w+)/"
     },
     database: {
@@ -43,6 +43,9 @@ var templates = {
         deleteChannel              : function(){},
         getAllChannel              : function(){},
         getUser                    : function(){}
+    },
+    ws:{
+        join:{}
     }
 };
 
