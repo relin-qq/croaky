@@ -15,7 +15,7 @@ var ErrorType = require("./js/errortype.js");
 var Templates = require("./js/templates.js");
 var WebsocketManager = require("./js/wsm.js").WebsocketManager;
 
-var authentication = function(req){
+var authentication = function(req, onError){
     var path     = Url.parse(req.url).pathname;
 
     var hash     = req.headers["authorization"];
@@ -23,12 +23,16 @@ var authentication = function(req){
     var username = req.headers["x-user"];
     var method   = req.method;
 
-    if(!hash || !xdate || !username)
-        return ErrorType.AUTH_MISSING_FIELDS;
+    if(!hash || !xdate || !username){
+        onError(ErrorType.AUTH_MISSING_FIELDS);
+        return null;
+    }
 
     //TODO: check auth here
-    if(!auth)
-        return ErrorType.AUTH_FAILED;
+    if(!auth){
+        onError(ErrorType.AUTH_FAILED);
+        return null;
+    }
 
     return {
         user  : username,
@@ -147,10 +151,18 @@ var Routing = function(handler){
     //Will fire if all the data has been captured, meaning you do not have to concat the json chunks (director feature)
     router.attach(function(){
         this.auth = authentication(this.req);
-        this.data = JSON.parse(this.req.chunks.join("")) || null;
+        this.data = JSON.tryParse(this.req.chunks.join("")) || null;
     });
 
     return router;
+};
+
+JSON.tryParse = function(data){
+    try{
+        return JSON.parse(data);
+    }catch(e){
+        return null;
+    }
 };
 
 var Server = function(config, router){
@@ -170,15 +182,15 @@ var Server = function(config, router){
 
         req.on("end", function(){
             router.dispatch(req, res, function (error) {
-                res.writeHead(error.code);
+                res.writeHead(error.statusCode);
                 res.end(error.msg);
             });
         });
     };
 
     self.authentication = authentication;
-
     var nativeServer = null;
+
     var start = function(){
         try{
             //Trying to start HTTPS-Server

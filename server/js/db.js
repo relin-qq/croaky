@@ -1,4 +1,5 @@
 var Fs =  require("fs");
+var Util = require("util");
 //External Modules
 var Extend = require("extend");
 var SQL    = require("sqlite3").verbose();
@@ -64,7 +65,7 @@ var STATEMENTS = {
 
 var createError = function(error){
     return {
-        code: SQLERROR[error.code],
+        statusCode: SQLERROR[error.code],
         msg: error.toString()
     };
 };
@@ -191,6 +192,6 @@ var Database = function(path) {
 };
 
 exports.create = function(path){
-    console.log(require("path").resolve(path));
+    Util.log("Database Path:",require("path").resolve(path));
     return new Database(path);
 };

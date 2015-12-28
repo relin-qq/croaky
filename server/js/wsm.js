@@ -36,16 +36,13 @@ var FLAGS = {
     VIDEO_LEAVE      : 128
 }
 
-var tryJSON = function(string){
-    try {
-        return JSON.parse(string);
-    }catch(e){
-        console.log(e);
-        return null;
-    }
-};
-
 var WebsocketManager = function(server){
+    var clients = {};
+
+    var handleIncomingData = function(data){
+        console.log(data)
+    };
+
     //Websocket server on listening on the /ws path
     var ws = new Primus(server.getNativeServer(), {
         pathname: "/ws"
@@ -54,13 +51,18 @@ var WebsocketManager = function(server){
     ws.authorize(function (req, done) {
         var auth = server.authentication(req);
         if(!auth)
-            return done({});
+            return done(auth);
 
         done();
     });
 
     ws.on("connection", function (spark) {
-        spark.write("hello connnection")
+        clients[spark.id] = spark;
+        spark.on("data", handleIncomingData);
+    });
+
+    ws.on("disconnection", function(spark){
+        delete clients[spark.id];
     });
 };
 

@@ -6,7 +6,7 @@ var Fs        = require("fs");
 //Local Modules
 var ErrorType = require("./errortype.js");
 var Templates = require("./templates.js");
-var Database = require("./db.js").create("./db/db.sql");
+var Database  = require("./db.js").create("./db/db.sql");
 
 
 var createWebsocket = function(){
@@ -38,7 +38,7 @@ var createUser = function(userName, callback, errorCallback){
             callback(null, error);
 
         callback({
-            code: 200
+            status: 200
         });
     });
 };
