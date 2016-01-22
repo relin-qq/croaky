@@ -31,7 +31,7 @@ var getPrivateMessages = function(userName, targetUsername, callback){
 
 };
 
-var createUser = function(userName, callback, errorCallback){
+var createUser = function(userName, callback){
     //TODO: check with template
     Database.createUser(userName, this.data.email, this.data.password, function(error){
         if(error)

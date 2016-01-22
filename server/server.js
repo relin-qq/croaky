@@ -15,7 +15,7 @@ var ErrorType = require("./js/errortype.js");
 var Templates = require("./js/templates.js");
 var WebsocketManager = require("./js/wsm.js").WebsocketManager;
 
-var authentication = function(req, onError){
+var authentication = function(req){
     var path     = Url.parse(req.url).pathname;
 
     var hash     = req.headers["authorization"];
@@ -24,14 +24,14 @@ var authentication = function(req, onError){
     var method   = req.method;
 
     if(!hash || !xdate || !username){
-        onError(ErrorType.AUTH_MISSING_FIELDS);
-        return null;
+        // onError(ErrorType.AUTH_MISSING_FIELDS);
+        return ErrorType.AUTH_MISSING_FIELDS;
     }
 
     //TODO: check auth here
     if(!auth){
-        onError(ErrorType.AUTH_FAILED);
-        return null;
+        // onError(ErrorType.AUTH_FAILED);
+        return ErrorType.AUTH_MISSING_FIELDS;
     }
 
     return {
@@ -51,7 +51,7 @@ var Routing = function(handler){
         next(); 
     };
 
-    //Hack workaround. Directory uses the this scope to work with response and request objects
+    //Hack workaround. Directory uses the "this" scope to work with response and request objects
     var bind = function(func){
         //Director Response Wrapper. Only works with "async" functionality from the Director libary
         var responseHandler = function(){
@@ -67,8 +67,7 @@ var Routing = function(handler){
                     return next(error);
 
 
-                self.res.writeHead(response.code);
-                self.res.end(JSON.stringify(response.msg));
+                return next(response);
             });
 
             func.apply(self, args);
@@ -182,8 +181,9 @@ var Server = function(config, router){
 
         req.on("end", function(){
             router.dispatch(req, res, function (error) {
-                res.writeHead(error.statusCode);
-                res.end(error.msg);
+                console.log(error)
+                res.writeHead(error.statusCode || error.status);
+                res.end(error.msg || error.message);
             });
         });
     };
