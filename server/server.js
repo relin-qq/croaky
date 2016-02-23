@@ -180,10 +180,10 @@ var Server = function(config, router){
         });
 
         req.on("end", function(){
-            router.dispatch(req, res, function (error) {
-                console.log(error)
-                res.writeHead(error.statusCode || error.status);
-                res.end(error.msg || error.message);
+            router.dispatch(req, res, function (result) {
+                console.log(result)
+                res.writeHead(result.statusCode || result.status);
+                res.end(JSON.stringify(result.msg || JSON.stringify(result.message) || {}));
             });
         });
     };

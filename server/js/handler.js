@@ -14,8 +14,22 @@ var createWebsocket = function(){
 };
 
 var getUser = function(userName, callback){
-    Database.getUser(userName,"bla", "bla", function(error, result){
-        console.log(error, result);
+    Database.getUser(userName, function(error, result){
+        if(error)
+            callback(null, error);
+
+        console.log("Get user: ",error, result);
+        if(!result) {
+            callback({
+                status: 404
+            });
+            return;
+        }
+        
+        callback({
+            status: 200,
+            msg: {username: result.username,email: result.email}
+        });
     });
 };
 

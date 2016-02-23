@@ -185,10 +185,6 @@ var Database = function(path) {
             callback(null, rows);
         });
     };
-
-    self.getUser = function(){
-
-    };
 };
 
 exports.create = function(path){
