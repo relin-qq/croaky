@@ -34,6 +34,8 @@ var authentication = function(req){
         return ErrorType.AUTH_MISSING_FIELDS;
     }
 
+    console.log("Auth: hash: "+hash+" xdate: "+xdate+" username: "+username+" method: "+method);
+
     return {
         user  : username,
         date  : xdate,
@@ -47,8 +49,12 @@ var Routing = function(handler){
     //should be defined in the routing definition... because of reasons.
 
     var checkAuth = function(){
+        console.log("checkAuth");
         var next = arguments[arguments.length - 1];
-        next(); 
+        if(this.auth.hash != undefined) {
+            next(); 
+        }
+        next(false);
     };
 
     //Hack workaround. Directory uses the "this" scope to work with response and request objects
