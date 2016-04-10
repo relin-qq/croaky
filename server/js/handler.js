@@ -13,6 +13,14 @@ var createWebsocket = function(){
     console.log("ws")
 };
 
+var getAuthData = function(userName, callback){
+    Database.getAuthData(userName, function(error, result){
+        if(error)
+            callback(error);
+        callback(result);
+    });
+}
+
 var getUser = function(userName, callback){
     Database.getUser(userName, function(error, result){
         if(error)
@@ -106,6 +114,7 @@ var getUsers = function(callback){
 };
 
 exports.createWebsocket = createWebsocket;
+exports.getAuthData = getAuthData;
 exports.getUser = getUser;
 exports.modifyUser = modifyUser;
 exports.getConversationPartnerNames = getConversationPartnerNames;

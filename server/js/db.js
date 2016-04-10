@@ -38,6 +38,7 @@ var SQLERROR = {
 var STATEMENTS = {
     "select" : {
         user      : "SELECT * FROM users WHERE username = ?",
+        auth      : "SELECT * FROM users WHERE username = ?",
         enlistment: "SELECT groupname FROM groups WHERE username = ?",
         groupUsers: "SELECT username FROM groups WHERE groupname = ?",
         channel   : "SELECT info FROM channels WHERE channelname = ? AND groupname = ?",
@@ -87,6 +88,15 @@ var Database = function(path) {
 
     self.getUser = function(userName, callback){
         db.get(STATEMENTS.select.user, [userName], function(error, row){
+            if(error)
+                return callback(createError(error));
+
+            callback(null, row);
+        });
+    };
+    
+    self.getAuthData = function(userName, callback){
+        db.get(STATEMENTS.select.auth, [userName], function(error, row){
             if(error)
                 return callback(createError(error));
 

@@ -15,7 +15,7 @@ var ErrorType = require("./js/errortype.js");
 var Templates = require("./js/templates.js");
 var WebsocketManager = require("./js/wsm.js").WebsocketManager;
 
-var authentication = function(req){
+var authentication = function(req,cb){
     var path     = Url.parse(req.url).pathname;
 
     var hash     = req.headers["authorization"];
@@ -24,37 +24,47 @@ var authentication = function(req){
     var method   = req.method;
 
     if(!hash || !xdate || !username){
-        // onError(ErrorType.AUTH_MISSING_FIELDS);
         return ErrorType.AUTH_MISSING_FIELDS;
     }
 
     //TODO: check auth here
-    if(!auth){
-        // onError(ErrorType.AUTH_FAILED);
-        return ErrorType.AUTH_MISSING_FIELDS;
-    }
-
     console.log("Auth: hash: "+hash+" xdate: "+xdate+" username: "+username+" method: "+method);
 
-    return {
-        user  : username,
-        date  : xdate,
-        method: method,
-        path  : path,
-        hash  : hash
-    };
+    Handler.getAuthData(username,function(result) {
+        console.log("GetAuthData");
+        console.log(result);
+        // TODO: Check auth here!
+        /*
+        if(!auth){
+            return ErrorType.AUTH_FAILED;
+        }
+        */
+
+        cb({
+            user  : username,
+            date  : xdate,
+            method: method,
+            path  : path,
+            hash  : hash
+        });
+    });
 };
 
 var Routing = function(handler){
     //should be defined in the routing definition... because of reasons.
 
     var checkAuth = function(){
+        var self = this;
         console.log("checkAuth");
         var next = arguments[arguments.length - 1];
-        if(this.auth.hash != undefined) {
-            next(); 
-        }
-        next(false);
+        authentication(self.req,function(auth) {
+            self.auth = auth;
+            if(self.auth.hash != undefined) {
+                next(); 
+            }
+            console.log(next);
+            next(self.auth);
+        });
     };
 
     //Hack workaround. Directory uses the "this" scope to work with response and request objects
@@ -155,7 +165,6 @@ var Routing = function(handler){
 
     //Will fire if all the data has been captured, meaning you do not have to concat the json chunks (director feature)
     router.attach(function(){
-        this.auth = authentication(this.req);
         this.data = JSON.tryParse(this.req.chunks.join("")) || null;
     });
 

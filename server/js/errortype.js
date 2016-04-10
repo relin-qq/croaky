@@ -4,7 +4,7 @@
 var Response = {
     OK                   : {status: 200, message: "Everthing went better than expected"},
     CLIENT_PATH_NOT_FOUND: {status: 404, message: "Path not Found"},
-    AUTH_FAILED          : {status: 400, message: "Auth Failed"},
+    AUTH_FAILED          : {status: 403, message: "Auth Failed"},
     AUTH_MISSING_FIELDS  : {status: 400, message: "Missing Auth Fields"}
 };
 
