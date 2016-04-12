@@ -54,7 +54,7 @@ var STATEMENTS = {
         channel  : "INSERT INTO channels(channelname, groupname) VALUES (?,?)"
     },
     "delete" : {
-        enlistment: "DELETE FROM enlistment WHERE groupname = ? AND username = ?"
+        enlistment: "DELETE FROM enlistments WHERE groupname = ? AND username = ?"
     },
     "create" : {
         users       : "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, email TEXT, password TEXT)",
@@ -200,7 +200,6 @@ var Database = function(path) {
         db.all(STATEMENTS.select.channels, [groupName], function(error, rows){
             if(error)
                 return callback(createError(error));
-
             
             callback(null, rows);
         });

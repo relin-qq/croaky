@@ -134,8 +134,17 @@ var deleteChannel = function(callback){
 
 };
 
-var getAllChannel = function(callback){
+var getAllChannel = function(groupName, callback){
+    console.log("getAllChannel");
+    Database.getAllChannel(groupName, function(error, result){
+        console.log(result);
+        if(error)
+            callback(null,error);
 
+        callback({
+            status: 200
+        });
+    });
 };
 
 var joinChannel = function(channel,pass,callback){
@@ -156,6 +165,7 @@ exports.createUser = createUser;
 exports.createGroup = createGroup;
 exports.checkGroupPass = checkGroupPass;
 exports.enlist = enlist;
+exports.unenlist = unenlist;
 exports.checkRole = checkRole;
 exports.modifyGroup = modifyGroup;
 exports.getChannel = getChannel;
