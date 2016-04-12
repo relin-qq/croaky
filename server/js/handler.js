@@ -84,11 +84,12 @@ var checkGroupPass = function(groupName, pass, callback){
     callback();
 };
 
-var enlist = function(groupName, callback){
+var enlist = function(groupName, pass, callback){
     Database.enlist(this.auth.user, groupName, function(error, result){
-        console.log(result);
+        console.log(callback);
+        //console.log(result);
         if(error)
-            callback(null,error);
+            callback(null, error);
 
         callback({
             status: 200
@@ -96,7 +97,7 @@ var enlist = function(groupName, callback){
     });
 };
 
-var unenlist = function(groupName, callback){
+var unenlist = function(groupName, pass, callback){
     Database.unenlist(this.auth.user, groupName, function(error, result){
         console.log(result);
         if(error)

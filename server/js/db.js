@@ -140,19 +140,19 @@ var Database = function(path) {
         callback(null);
     };
 
-    self.enlist = function(userName, groupName){
+    self.enlist = function(userName, groupName, callback){
         db.run(STATEMENTS.insert.enlistment, [groupName, userName], function(error){
             if(error)
-                return callback(error);
+                return callback(createError(error));
 
             callback(null);
         });
     };
     
-    self.unenlist = function(userName, groupName){
+    self.unenlist = function(userName, groupName, callback){
         db.run(STATEMENTS.delete.enlistment, [groupName, userName], function(error){
             if(error)
-                return callback(error);
+                return callback(createError(error));
 
             callback(null);
         });
