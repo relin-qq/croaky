@@ -61,6 +61,7 @@ var Routing = function(handler){
             self.auth = auth;
             if(self.auth.hash != undefined) {
                 next(); 
+                return;
             }
             console.log(next);
             next(self.auth);
@@ -131,9 +132,9 @@ var Routing = function(handler){
         },
         "/g/:groupName":{
             before: [bind(checkAuth)],
-            put   : [check("group"), bind(handler.createGroup)],
+            put   : [bind(handler.createGroup)],
             "/join/:pass":{
-                before: [bind(handler.checkPass)],
+                before: [bind(handler.checkGroupPass)],
                 put   : bind(handler.enlist)
             },
             "/manage":{
@@ -145,6 +146,9 @@ var Routing = function(handler){
                 post  : bind(handler.modifyChannel),
                 put   : bind(handler.createChannel),
                 delete: bind(handler.deleteChannel)
+            },
+            "/channels/:channel/join/:pass":{
+                post  : bind(handler.joinChannel)
             },
             "/channels/[\*]":{
                 get: bind(handler.getAllChannel)

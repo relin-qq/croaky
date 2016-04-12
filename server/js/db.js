@@ -50,8 +50,8 @@ var STATEMENTS = {
     "insert" : {
         enlistment: "INSERT INTO enlistments(groupname, username) VALUES (?,?)",
         user      : "INSERT INTO users(username, email, password) VALUES (?,?,?)",
-        groups    : "INSERT INTO groups(groupname) VALUES (?)",
-        channels  : "INSERT INTO channels(channelname, groupname) VALUES (?,?)"
+        group    : "INSERT INTO groups(groupname) VALUES (?)",
+        channel  : "INSERT INTO channels(channelname, groupname) VALUES (?,?)"
     },
     "delete" : {
         groupUser: "DELETE FROM enlistment WHERE groupname = ? AND username = ?"
@@ -135,8 +135,9 @@ var Database = function(path) {
         });
     };
 
-    self.checkPass = function(){
-
+    self.checkGroupPass = function(pass, callback){
+        //TODO: Enable groups with passwords. Needs DB work.
+        callback(null);
     };
 
     self.enlist = function(userName, groupName){

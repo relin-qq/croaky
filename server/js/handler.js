@@ -66,8 +66,15 @@ var createUser = function(userName, callback){
 };
 
 var createGroup = function(groupName, callback){
-    Database.createGroup(this.auth.user, groupName, function(error){
+    console.log("Handler: createGroup");
+    Database.createGroup(groupName, function(error){
         console.log(error);
+        if(error)
+            callback(null, error);
+
+        callback({
+            status: 200
+        });
     });
 };
 
@@ -106,6 +113,10 @@ var deleteChannel = function(callback){
 };
 
 var getAllChannel = function(callback){
+
+};
+
+var joinChannel = function(callback){
 
 };
 
