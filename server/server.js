@@ -115,13 +115,9 @@ var Routing = function(handler){
 
     //Non websocket definitions
     var pathDefinitions = {
-        "/r/:username":{
-            put: bind(handler.createUser)
-        },
         "/u/:userName":{
             before: [checkAuth],
             get   : bind(handler.getUser),
-            post  : bind(handler.modifyUser),
             "/pm/[\*]":{
                 get: bind(handler.getConversationPartnerNames)
             },
@@ -131,26 +127,8 @@ var Routing = function(handler){
         },
         "/g/:groupName":{
             before: [checkAuth],
-            "/create":{
-                put: bind(handler.createGroup)
-            },
-            "/join/:pass":{
-                before: [bind(handler.checkGroupPass)],
-                put   : bind(handler.enlist),
-                delete: bind(handler.unenlist) 
-            },
-            "/manage":{
-                before: [bind(handler.checkRole)],
-                post  : bind(handler.modifyGroup)
-            },
             "/channels/:channel": {
                 get   : bind(handler.getChannel),
-                post  : bind(handler.modifyChannel),
-                put   : bind(handler.createChannel),
-                delete: bind(handler.deleteChannel),
-                "/join/:pass":{
-                    post  : bind(handler.joinChannel)
-                }
             },
             "/channels/([\*])":{
                 get: bind(handler.getAllChannel)
