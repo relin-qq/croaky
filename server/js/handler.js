@@ -126,8 +126,17 @@ var modifyChannel = function(callback){
 
 };
 
-var createChannel = function(callback){
+var createChannel = function(groupName, channelName, callback){
+    Database.createChannel(channelName, groupName, function(error, result){
+        console.log(callback);
+        //console.log(result);
+        if(error)
+            callback(null, error);
 
+        callback({
+            status: 200
+        });
+    });
 };
 
 var deleteChannel = function(callback){

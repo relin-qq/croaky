@@ -152,10 +152,10 @@ var Routing = function(handler){
                     post  : bind(handler.joinChannel)
                 }
             },
-            "/channels/[\*]":{
+            "/channels/([\*])":{
                 get: bind(handler.getAllChannel)
             },
-            "/users/([\*])" : {
+            "/users" : {
                 get: bind(handler.getAllGroupUsers)
             }
         }        

@@ -60,7 +60,7 @@ var STATEMENTS = {
         users       : "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, email TEXT, password TEXT)",
         groups      : "CREATE TABLE IF NOT EXISTS groups (groupname TEXT PRIMARY KEY)",
         enlistments : "CREATE TABLE IF NOT EXISTS enlistments (enlistID INTEGER PRIMARY KEY AUTOINCREMENT, groupname TEXT, username TEXT, FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, FOREIGN KEY (groupname) REFERENCES groups(groupname) ON DELETE CASCADE, UNIQUE (groupname, username))",
-        channels    : "CREATE TABLE IF NOT EXISTS channels (channelID INTEGER PRIMARY KEY AUTOINCREMENT, channelname TEXT, groupname TEXT, info TEXT, FOREIGN KEY (groupname) ON DELETE CASCADE, UNIQUE(channelname, groupname))"
+        channels    : "CREATE TABLE IF NOT EXISTS channels (channelID INTEGER PRIMARY KEY AUTOINCREMENT, channelname TEXT, groupname TEXT, info TEXT, FOREIGN KEY (groupname) REFERENCES groups(groupname) ON DELETE CASCADE, UNIQUE(channelname, groupname))"
     }
 };
 
@@ -81,6 +81,7 @@ var Database = function(path) {
     db.serialize(function() {
         //Foreign keys must be activated
         db.run("PRAGMA foreign_keys = on;");
+        db.run(STATEMENTS.create.channels);
         db.run(STATEMENTS.create.users);
         db.run(STATEMENTS.create.groups);
         db.run(STATEMENTS.create.enlistments);
@@ -188,15 +189,22 @@ var Database = function(path) {
 
     };
 
-    self.createChannel = function(){
+    self.createChannel = function(channelName, groupName, callback){
+        db.run(STATEMENTS.insert.channel, [channelName, groupName], function(error){
+            if(error)
+                return callback(createError(error));
 
+            callback(null);
+        });
     };
 
     self.deleteChannel = function(){
 
     };
 
-    self.getAllChannel = function(groupName){
+    self.getAllChannel = function(groupName,callback){
+        console.log("DB getAllChannel: ",callback);
+        console.log(groupName);
         db.all(STATEMENTS.select.channels, [groupName], function(error, rows){
             if(error)
                 return callback(createError(error));
