@@ -67,8 +67,10 @@ var createUser = function(userName, callback){
 
 var createGroup = function(groupName, callback){
     console.log("Handler: createGroup");
-    Database.createGroup(groupName, function(error){
+    console.log(callback);
+    Database.createGroup(groupName, function(error, result){
         console.log(error);
+        console.log(callback);
         if(error)
             callback(null, error);
 
@@ -78,15 +80,34 @@ var createGroup = function(groupName, callback){
     });
 };
 
-var checkPass = function(groupName, pass, callback){
+var checkGroupPass = function(groupName, pass, callback){
     callback();
 };
 
 var enlist = function(groupName, callback){
     Database.enlist(this.auth.user, groupName, function(error, result){
         console.log(result);
+        if(error)
+            callback(null,error);
+
+        callback({
+            status: 200
+        });
     });
 };
+
+var unenlist = function(groupName, callback){
+    Database.unenlist(this.auth.user, groupName, function(error, result){
+        console.log(result);
+        if(error)
+            callback(null,error);
+
+        callback({
+            status: 200
+        });
+    });
+};
+
 
 var checkRole = function(groupName, role, callback){
 
@@ -116,7 +137,7 @@ var getAllChannel = function(callback){
 
 };
 
-var joinChannel = function(callback){
+var joinChannel = function(channel,pass,callback){
 
 };
 
@@ -132,7 +153,7 @@ exports.getConversationPartnerNames = getConversationPartnerNames;
 exports.getPrivateMessages = getPrivateMessages;
 exports.createUser = createUser;
 exports.createGroup = createGroup;
-exports.checkPass = checkPass;
+exports.checkGroupPass = checkGroupPass;
 exports.enlist = enlist;
 exports.checkRole = checkRole;
 exports.modifyGroup = modifyGroup;

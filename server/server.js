@@ -135,7 +135,8 @@ var Routing = function(handler){
             put   : [bind(handler.createGroup)],
             "/join/:pass":{
                 before: [bind(handler.checkGroupPass)],
-                put   : bind(handler.enlist)
+                put   : bind(handler.enlist),
+                delete: bind(handler.unenlist) 
             },
             "/manage":{
                 before: [bind(handler.checkRole)],
@@ -145,10 +146,10 @@ var Routing = function(handler){
                 get   : bind(handler.getChannel),
                 post  : bind(handler.modifyChannel),
                 put   : bind(handler.createChannel),
-                delete: bind(handler.deleteChannel)
-            },
-            "/channels/:channel/join/:pass":{
-                post  : bind(handler.joinChannel)
+                delete: bind(handler.deleteChannel),
+                "/join/:pass":{
+                    post  : bind(handler.joinChannel)
+                }
             },
             "/channels/[\*]":{
                 get: bind(handler.getAllChannel)

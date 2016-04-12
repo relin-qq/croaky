@@ -54,7 +54,7 @@ var STATEMENTS = {
         channel  : "INSERT INTO channels(channelname, groupname) VALUES (?,?)"
     },
     "delete" : {
-        groupUser: "DELETE FROM enlistment WHERE groupname = ? AND username = ?"
+        enlistment: "DELETE FROM enlistment WHERE groupname = ? AND username = ?"
     },
     "create" : {
         users       : "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, email TEXT, password TEXT)",
@@ -142,6 +142,15 @@ var Database = function(path) {
 
     self.enlist = function(userName, groupName){
         db.run(STATEMENTS.insert.enlistment, [groupName, userName], function(error){
+            if(error)
+                return callback(error);
+
+            callback(null);
+        });
+    };
+    
+    self.unenlist = function(userName, groupName){
+        db.run(STATEMENTS.delete.enlistment, [groupName, userName], function(error){
             if(error)
                 return callback(error);
 
