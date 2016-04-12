@@ -23,14 +23,13 @@ var authentication = function(req,cb){
     var username = req.headers["x-user"];
     var method   = req.method;
 
-    if(!hash || !xdate || !username){
-        return ErrorType.AUTH_MISSING_FIELDS;
-    }
+    if(!hash || !xdate || !username)
+        return cb(ErrorType.AUTH_MISSING_FIELDS);
 
     //TODO: check auth here
     console.log("Auth: hash: "+hash+" xdate: "+xdate+" username: "+username+" method: "+method);
 
-    Handler.getAuthData(username,function(result) {
+    Handler.getAuthData(username, function(result) {
         console.log("GetAuthData");
         console.log(result);
         // TODO: Check auth here!
@@ -55,9 +54,9 @@ var Routing = function(handler){
 
     var checkAuth = function(){
         var self = this;
-        console.log("checkAuth");
         var next = arguments[arguments.length - 1];
-        authentication(self.req,function(auth) {
+
+        authentication(self.req, function(auth) {
             self.auth = auth;
             if(self.auth.hash != undefined) {
                 next(); 
@@ -131,8 +130,10 @@ var Routing = function(handler){
             }
         },
         "/g/:groupName":{
-            before: [bind(checkAuth)],
-            put   : [bind(handler.createGroup)],
+            before: [checkAuth],
+            "/create":{
+                put: bind(handler.createGroup)
+            },
             "/join/:pass":{
                 before: [bind(handler.checkGroupPass)],
                 put   : bind(handler.enlist),
