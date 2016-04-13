@@ -30,6 +30,11 @@ angular.module('voiceApp', ['ngSanitize'])
             switch(data.op) {
                 case voiceCtrl.FLAGS.GROUP_JOIN:
                       console.log("Group join response",data);
+                      if(data.result == 200) {
+                          voiceCtrl.logChat("Joined group!");
+                      } else {
+                          voiceCtrl.logChat("Failed to join group!");
+                      }
                       break;
                 default:
                       console.log("Unknown opcode in websocket: ",data);

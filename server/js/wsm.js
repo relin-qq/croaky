@@ -41,15 +41,16 @@ var WebsocketManager = function(server){
     var clients = {};
 
     var handleIncomingData = function(data){
-        console.log("handleIncomingData: ",this.croaky.user);
+        var self = this;
+        console.log("handleIncomingData: ",self.croaky.user);
         switch(data.op) {
             case FLAGS.GROUP_JOIN:
-                Handler.enlist(this.croaky.user,data.groupName,function(result) {
-                    if(result.status == 200) {
-                        this.write({op: FLAGS.GROUP_JOIN, result:result.status});
-                    } else {
-                        this.write({op: FLAGS.GROUP_JOIN, result:result.status, cause:result.message});
+                Handler.enlist(self.croaky.user,data.groupName,data.pass,function(result,error) {
+                    if(error) {
+                        self.write({op: FLAGS.GROUP_JOIN, result:error.code, cause:error});
+                        return;
                     }
+                    self.write({op: FLAGS.GROUP_JOIN, result:result.status});
                 });
                 break;
             default:
