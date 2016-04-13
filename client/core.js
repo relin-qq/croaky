@@ -4,18 +4,42 @@ angular.module('voiceApp', ['ngSanitize'])
 .controller('VoiceController', function($scope) {
     var voiceCtrl = this;
     window.voiceCtrl = voiceCtrl;
+    voiceCtrl.FLAGS = {
+        GROUP_JOIN       : 0,
+        GROUP_LEAVE      : 1,
+        CHANNEL_JOIN     : 2,
+        CHANNEL_LEAVE    : 3,
+        CHANNEL_MSG      : 4,
+        ONLINE_STATE     : 5,
+        INTERACTION_STATE: 6
+    };
     voiceCtrl.croakyUrl = "https://croaky.epow0.org/";
     voiceCtrl.audioButtonText = "Mute Audio";
     voiceCtrl.videoButtonText = "Mute Video";
     voiceCtrl.videoRoomListeners = {};
 
-    voiceCtrl.primus = new Primus(voiceCtrl.croakyUrl);
-
-    voiceCtrl.primus.on('data', function message(data) {
-          console.log('Received a new message from the server', data);
-    });
 
     voiceCtrl.login = function() {
+        var xuser = voiceCtrl.chosenusername;
+        var xdate = new Date().toISOString();
+        //TODO: Generate a real authorization hash
+        var authorization = "NYI";
+        voiceCtrl.primus = new Primus(voiceCtrl.croakyUrl+"?x-user="+xuser+"&x-date="+xdate+"&authorization="+authorization);
+
+        voiceCtrl.primus.on('data', function(data) {
+            switch(data.op) {
+                case voiceCtrl.FLAGS.GROUP_JOIN:
+                      console.log("Group join response",data);
+                      break;
+                default:
+                      console.log("Unknown opcode in websocket: ",data);
+            }
+              console.log('Received a new message from the server', data);
+        });
+    };
+
+    voiceCtrl.joinGroup = function() {
+        voiceCtrl.primus.write({op:voiceCtrl.FLAGS.GROUP_JOIN,groupName:voiceCtrl.chosengroup});
     };
 
     Janus.init({debug: "all", callback: function() {

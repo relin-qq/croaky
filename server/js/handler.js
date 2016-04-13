@@ -84,8 +84,8 @@ var checkGroupPass = function(groupName, pass, callback){
     callback();
 };
 
-var enlist = function(groupName, pass, callback){
-    Database.enlist(this.auth.user, groupName, function(error, result){
+var enlist = function(userName, groupName, pass, callback){
+    Database.enlist(userName, groupName, function(error, result){
         console.log(callback);
         //console.log(result);
         if(error)

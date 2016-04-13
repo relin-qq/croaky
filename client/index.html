@@ -20,6 +20,8 @@
         <nav>
             <input type="text" ng-model="voiceCtrl.chosenusername" placeholder="Username"><br />
             <input type="password" ng-model="voiceCtrl.chosenpass" placeholder="Password"><button ng-click="voiceCtrl.login()">Login</button><br />
+            <input type="text" ng-model="voiceCtrl.chosengroup" placeholder="Groupname"><br />
+            <button ng-click="voiceCtrl.joinGroup()">Join Group</button><br />
         </nav>
         <section id="main">
             <button ng-click="voiceCtrl.toggleLocalVideo()">{{voiceCtrl.videoButtonText}}</button><button ng-click="voiceCtrl.toggleLocalAudio()">{{voiceCtrl.audioButtonText}}</button><br />

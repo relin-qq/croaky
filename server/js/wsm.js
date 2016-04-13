@@ -1,4 +1,6 @@
 var Primus    = require("primus");
+var Handler   = require("./handler.js");
+var ErrorType   = require("./errortype.js");
 
 // reconnect        | scheduled | public  client  We're scheduling a reconnect.
 // reconnect        | public    | client  Reconnect attempt is about to be made.
@@ -27,21 +29,32 @@ var dir = "../client/";
 
 var FLAGS = {
     GROUP_JOIN       : 0, 
-    VIDEO_JOIN       : 1, 
+    GROUP_LEAVE      : 1,
     CHANNEL_JOIN     : 2,
-    ONLINE_STATE     : 4,
-    INTERACTION_STATE: 8,
-    PING             : 16,
-    CHANNEL_POST     : 32,
-    GROUP_LEAVE      : 64,
-    VIDEO_LEAVE      : 128
-}
+    CHANNEL_LEAVE    : 3,
+    CHANNEL_MSG      : 4,
+    ONLINE_STATE     : 5,
+    INTERACTION_STATE: 6
+};
 
 var WebsocketManager = function(server){
     var clients = {};
 
     var handleIncomingData = function(data){
-        console.log(data)
+        console.log("handleIncomingData: ",this.croaky.user);
+        switch(data.op) {
+            case FLAGS.GROUP_JOIN:
+                Handler.enlist(this.croaky.user,data.groupName,function(result) {
+                    if(result.status == 200) {
+                        this.write({op: FLAGS.GROUP_JOIN, result:result.status});
+                    } else {
+                        this.write({op: FLAGS.GROUP_JOIN, result:result.status, cause:result.message});
+                    }
+                });
+                break;
+            default:
+                console.log("Unknown opcode in websocket: ",data);
+        }
     };
 
     //Websocket server on listening on the /ws path
@@ -52,14 +65,18 @@ var WebsocketManager = function(server){
 
     primus.authorize(function (req, done) {
         var auth = server.authentication(req,function(result) {
+            console.log("WS AUTH: ",result);
+            if(!result.user) {
+                done(result);
+            }
             done();
         });
     });
 
     primus.on("connection", function (spark) {
         console.log("WS: New websocket connection",spark);
+        spark.croaky = {user: spark.query["x-user"]};
         clients[spark.id] = spark;
-        spark.write('Hello world');
         spark.on("data", handleIncomingData);
     });
 

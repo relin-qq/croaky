@@ -18,20 +18,25 @@ var WebsocketManager = require("./js/wsm.js").WebsocketManager;
 var authentication = function(req,cb){
     var path     = Url.parse(req.url).pathname;
 
-    var hash     = req.headers["authorization"];
-    var xdate    = req.headers["x-date"];
-    var username = req.headers["x-user"];
+    if(req.headers["authorization"]) {
+        var hash     = req.headers["authorization"];
+        var xdate    = req.headers["x-date"];
+        var username = req.headers["x-user"];
+    } else if(req.query["authorization"]) {
+        var hash     = req.query["authorization"];
+        var xdate    = req.query["x-date"];
+        var username = req.query["x-user"];
+    }
     var method   = req.method;
 
     if(!hash || !xdate || !username)
         return cb(ErrorType.AUTH_MISSING_FIELDS);
 
     //TODO: check auth here
-    console.log("Auth: hash: "+hash+" xdate: "+xdate+" username: "+username+" method: "+method);
+    console.log("User sent hash: "+hash+" xdate: "+xdate+" username: "+username+" method: "+method);
 
     Handler.getAuthData(username, function(result) {
-        console.log("GetAuthData");
-        console.log(result);
+        console.log("DB authdata result: ",result);
         // TODO: Check auth here!
         /*
         if(!auth){
