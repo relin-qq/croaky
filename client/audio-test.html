@@ -1,0 +1,27 @@
+<video autoplay></video>
+<img src="">
+<canvas style="display:none;"></canvas>
+<script>
+    navigator.getUserMedia = (navigator.getUserMedia || 
+                          navigator.webkitGetUserMedia || 
+                          navigator.mozGetUserMedia || 
+                          navigator.msGetUserMedia);
+    
+    
+    var errorCallback = function(e) {
+        console.log('Rejected!',e);
+    };
+    var video = document.querySelector('video');
+    var canvas = document.querySelector('canvas');
+    var ctx = canvas.getContext('2d');
+
+    navigator.getUserMedia({
+        audio: true,
+        video: false
+    }, function(stream) {
+        video.src = window.URL.createObjectURL(stream);
+        video.onloadedmetadata = function(e) {
+            console.log('ready');
+        };
+    }, errorCallback);
+</script>

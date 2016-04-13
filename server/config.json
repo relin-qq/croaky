@@ -2,7 +2,7 @@
     "host"     : "comm.epow0.org",
     "interface": "0.0.0.0",
     "https"    : 4433,
-    "http"     : 8080,
+    "http"     : 5453,
     "ssl"      : {
         "key": "",
         "cert": ""

@@ -1,0 +1,138 @@
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1b262d;
+    @include filter-gradient(#1b262d, #6e83a2, vertical);
+    @include background-image(linear-gradient(top, #1b262d 0%,#6e83a2 100%));
+    color: ghostwhite;
+}
+
+header {
+    text-align: center;
+    padding: 5px;
+}
+
+nav {
+    height: 300px;
+    float: left;
+    padding: 1%;
+    width: 10%;
+}
+
+.login > form > input {
+    width: 100%;
+}
+
+.login > input {
+    width: 100%;
+}
+
+#main {
+    float: left;
+    padding: 1%;
+    width: 67%;
+    overflow: hidden;
+}
+
+#chat {
+    position: fixed;
+    background-color: #465055;
+    float: left;
+    margin: 1% 1% 1% 81%;
+    width: 19%;
+    max-height: 560px;
+    overflow: hidden;
+}
+
+#chatlines {
+    height: 500px;
+    word-wrap: break-word;
+    overflow-y: auto;
+}
+
+
+#chat > input {
+    width: 75%;
+}
+
+#chat > button {
+    width: 18%;
+}
+
+#sessions {
+    margin: 10px 0px 10px 0px;
+    width: 100%;
+}
+
+.userlist {
+}
+
+.userlist > ul {
+    padding: 0;
+    margin: 0px 0px 0px 15px;
+}
+
+.userlist > ul > li {
+    background-color: #586266;
+    margin: 0px 0px 3px 0px;
+    padding: 0px 0px 0px 3px;
+}
+
+
+#div-chat {
+    min-height: 300px;
+    width: 100%;
+}
+
+#me {
+    float:left;
+}
+
+#videos {
+    float:left;
+    width: 100%;
+}
+
+#videos > video {
+    width: 45%;
+    margin: 1% 2% 1% 2%;
+}
+
+#videos > div {
+    width: 45%;
+    margin: 1% 2% 1% 2%;
+}
+
+.button-session {
+    border: 5px outset red;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    background-color: #90101d;
+    color: ghostwhite;
+}
+
+.button-session:hover {
+    border-color: yellow;
+}
+
+.button-session:active {
+    border-style: inset;
+}
+
+ul.userlist {
+    padding-left: 0px;
+}
+
+li.user {
+    list-style-type: none;
+    /* background-color: grey; */
+    margin-top: 2px;
+}
+

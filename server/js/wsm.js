@@ -23,6 +23,7 @@ var Primus    = require("primus");
 // log              | public    | server  Log messages.
 // readyStateChange | public    | client/spark    The readyState has changed.
 
+var dir = "../client/";
 
 var FLAGS = {
     GROUP_JOIN       : 0, 
@@ -44,26 +45,29 @@ var WebsocketManager = function(server){
     };
 
     //Websocket server on listening on the /ws path
-    var ws = new Primus(server.getNativeServer(), {
-        pathname: "/ws"
+    var primus = new Primus(server.getNativeServer(), {
+        pathname: "/ws",
+        transformer: 'websockets'
     });
 
-    ws.authorize(function (req, done) {
-        var auth = server.authentication(req);
-        if(!auth)
-            return done(auth);
-
-        done();
+    primus.authorize(function (req, done) {
+        var auth = server.authentication(req,function(result) {
+            done();
+        });
     });
 
-    ws.on("connection", function (spark) {
+    primus.on("connection", function (spark) {
+        console.log("WS: New websocket connection",spark);
         clients[spark.id] = spark;
+        spark.write('Hello world');
         spark.on("data", handleIncomingData);
     });
 
-    ws.on("disconnection", function(spark){
+    primus.on("disconnection", function(spark){
         delete clients[spark.id];
     });
+    
+    primus.save(dir +'/primus.js');
 };
 
 exports.WebsocketManager = WebsocketManager;

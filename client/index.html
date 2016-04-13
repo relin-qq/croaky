@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html ng-app="voiceApp">
+    <head>
+        <script src="angular1-4-5.js"></script>
+        <script src="angular-sanitize.js"></script>
+        <script src="https://www.youtube.com/iframe_api"></script>
+        <script src="adapter.js"></script>
+        <script src="janus.js"></script>
+        <script src="primus.js"></script>
+        <script src="core.js"></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <meta charset="utf-8"/>
+    </head>
+    <title>epow0.org - WebRTC</title>
+    <body ng-controller="VoiceController as voiceCtrl">
+        <header>
+            <h1 align="center">Welcome to the epow0 WebRTC tool</h1>
+        </header>
+        <nav>
+            <input type="text" ng-model="voiceCtrl.chosenusername" placeholder="Username"><br />
+            <input type="password" ng-model="voiceCtrl.chosenpass" placeholder="Password"><button ng-click="voiceCtrl.login()">Login</button><br />
+        </nav>
+        <section id="main">
+            <button ng-click="voiceCtrl.toggleLocalVideo()">{{voiceCtrl.videoButtonText}}</button><button ng-click="voiceCtrl.toggleLocalAudio()">{{voiceCtrl.audioButtonText}}</button><br />
+            <canvas width="320px" height="30px" id="test" style="background-color: black;"></canvas>
+            <div id="videos">
+                <video id="me" controls autoplay muted></video>
+            </div>
+        </section>
+        <section id="chat">
+            <div id="container-chat">
+                <div id="chatlines" ng-bind-html="voiceCtrl.chatContent"></div><br />
+            </div>
+            <input type="text" ng-keypress="voiceCtrl.checkInput($event)" ng-model="voiceCtrl.chatInput" /><button ng-click="voiceCtrl.sendChat()">Send</button>
+        </section>
+    </body>
+</html>
